@@ -1,0 +1,29 @@
+# Python
+__pycache__/          # Python automatically creates cached bytecode files
+*.pyc                 # Compiled Python files, not needed in repo
+*.pyo                 # Compiled Python files, not needed in repo 
+*.pyd                 # Compiled Python files, not needed in repo
+.env                  # Environment variables file (often contains secrets)
+venv/                 # Virtual environment folder
+
+# dbt
+dbt_project/target/   # dbt output (compiled models) 
+dbt_project/.dbt/     # dbt metadata
+
+# Airflow
+airflow_dags/__pycache__/  # Cached Python files in DAGs
+logs/                      # Airflow log files
+airflow.db                  # Airflow SQLite database (if used)
+
+# OS / Editor
+.DS_Store             # macOS system file
+.vscode/
+
+
+# - Python: You don’t want temporary .pyc files or local virtual environments in Git.
+# - dbt: Only your source models matter; compiled models and logs are generated locally.
+# - Airflow: DAG caches and logs don’t need to be in version control.
+# - OS/Editor: Files like .DS_Store are system-specific and useless to others.
+# ✅ Using .gitignore is considered best practice in any project. It ensures your repo contains only the files that matter for collaboration or deployment.
+
+
