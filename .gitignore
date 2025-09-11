@@ -1,23 +1,26 @@
 # Python
-__pycache__/          # Python automatically creates cached bytecode files
-*.pyc                 # Compiled Python files, not needed in repo
-*.pyo                 # Compiled Python files, not needed in repo 
-*.pyd                 # Compiled Python files, not needed in repo
-.env                  # Environment variables file (often contains secrets)
-venv/                 # Virtual environment folder
+__pycache__/               # Python automatically creates cached bytecode files
+*.pyc                      # Compiled Python files, not needed in repo
+*.pyo                      # Compiled Python files, not needed in repo 
+*.pyd                      # Compiled Python files, not needed in repo
 
 # dbt
-dbt_project/target/   # dbt output (compiled models) 
-dbt_project/.dbt/     # dbt metadata
+dbt_project/target/        # dbt output (compiled models) 
+dbt_project/.dbt/          # dbt metadata
 
 # Airflow
 airflow_dags/__pycache__/  # Cached Python files in DAGs
 logs/                      # Airflow log files
-airflow.db                  # Airflow SQLite database (if used)
+airflow.db                 # Airflow SQLite database (if used)
 
 # OS / Editor
-.DS_Store             # macOS system file
+.DS_Store                  # macOS system file
 .vscode/
+
+# Environment & Keys
+keys/*.json                # CONFIDENTIAL JSON keys for GCP service accounts
+.env                       # Environment variables file (often contains secrets)
+venv/                      # Virtual environment folder
 
 
 # - Python: You don’t want temporary .pyc files or local virtual environments in Git.
