@@ -27,6 +27,6 @@ venv/                      # Virtual environment folder
 # - dbt: Only your source models matter; compiled models and logs are generated locally.
 # - Airflow: DAG caches and logs don’t need to be in version control.
 # - OS/Editor: Files like .DS_Store are system-specific and useless to others.
-# ✅ Using .gitignore is considered best practice in any project. It ensures your repo contains only the files that matter for collaboration or deployment.
+# ==> Using .gitignore is considered best practice in any project. It ensures your repo contains only the files that matter for collaboration or deployment.
 
 
