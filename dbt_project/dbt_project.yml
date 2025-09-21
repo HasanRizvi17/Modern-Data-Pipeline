@@ -1,0 +1,44 @@
+# Blueprint of our dbt project. It tells dbt:
+# - Project name & version → so dbt knows what it’s running.
+# - Where your models live → e.g., models/ folder.
+# - How to materialize models (table, view, incremental).
+# - Configurations for tests, docs, snapshots, seeds, macros, etc.
+# - Any overrides (like setting schema names, tags, custom paths)
+
+name: "modern_data_pipeline"
+version: '1.0.0'
+config-version: 2
+
+# configuring which "profile" dbt uses for this project
+profile: "modern_data_pipeline" # should match our profiles.yml entry
+
+# These configurations specify where dbt should look for different types of files.
+# The `model-paths` config, for example, states that models in this project can be found in the "models/" directory. 
+# You probably won't need to change these
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+target-path: "target"                      # directory which will store compiled SQL files
+clean-targets: ["target", "dbt_packages"]  # directories to be removed by `dbt clean`
+
+models:
+  modern_data_pipeline:
+    mdp_stg:
+      +schema: mdp_stg        # all models in models/mdp_stg directory on dbt (mdp_stg dataset on BigQuery)
+      +materialized: view     # # default materialization
+    mdp_int:
+      +schema: mdp_int
+      +materialized: view
+    mdp_fct:
+      +schema: mdp_fct
+      +materialized: view
+    mdp_dim:
+      +schema: mdp_dim
+      +materialized: view
+    mdp_rep:
+      +schema: mdp_rep
+      +materialized: view
+    

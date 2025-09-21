@@ -1,0 +1,18 @@
+modern_data_pipeline:
+  target: dev                           # which environment to use by default
+  outputs:                              # connection configs
+    dev:
+      type: bigquery                    # warehouse -- bigquery/postgres/snowflake
+      method: service-account           # dbt will authenticate with a GCP service account
+      project: data-pipeline-17-dev     # project id
+      dataset: mdp_stg                  # default dataset where dbt will create tables in dev
+      threads: 4                        # dbt will run up to 4 models in parallel
+      keyfile: "C:/Users/hasan/OneDrive - Higher Education Commission/PC Backup/0 Data Analytics Languages/Analytics Engineering - dbt/keys/data-pipeline-17-dev-49bafa0f4dc1.json"
+      # JSON key file for service account
+    prod:
+      type: bigquery
+      method: service-account
+      project: data-pipeline-17-prod
+      dataset: mdp_stg
+      threads: 4
+      keyfile: "C:/Users/hasan/OneDrive - Higher Education Commission/PC Backup/0 Data Analytics Languages/Analytics Engineering - dbt/keys/data-pipeline-17-prod-132483a883fa.json"
