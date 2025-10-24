@@ -1,0 +1,4 @@
+version: 2
+
+models:
+  - name: mdp_orders_stg

@@ -5,13 +5,17 @@ __pycache__/               # Python automatically creates cached bytecode files
 *.pyd                      # Compiled Python files, not needed in repo
 
 # dbt
-dbt_project/target/        # dbt output (compiled models) 
+dbt_project/target/        
 dbt_project/.dbt/          # dbt metadata
+dbt_project/logs/          # dbt output (compiled models)
+dbt_project/dbt_packages
+dbt_project/.user.yml
+dbt_project/package-lock.yml
 
 # Airflow
 airflow_dags/__pycache__/  # Cached Python files in DAGs
-logs/                      # Airflow log files
 airflow.db                 # Airflow SQLite database (if used)
+logs/
 
 # OS / Editor
 .DS_Store                  # macOS system file

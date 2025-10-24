@@ -1,6 +1,6 @@
 # Modern-Data-Pipeline
 
-# Initial:
+## Initial:
 1. Create GitHub repo & connect locally
 2. Create folder structure (dbt_project/, airflow_dags/, docker-compose.yml, README.md)
 
@@ -12,3 +12,5 @@
 4. Generate JSON keys and download them
 5. Create `.env` file with paths and IDs
 5. Create `.gitignore` file
+
+## 

@@ -26,9 +26,12 @@ clean-targets: ["target", "dbt_packages"]  # directories to be removed by `dbt c
 
 models:
   modern_data_pipeline:
+    mdp_ext:
+      +schema: mdp_ext
+      +materialized: view
     mdp_stg:
       +schema: mdp_stg        # all models in models/mdp_stg directory on dbt (mdp_stg dataset on BigQuery)
-      +materialized: view     # # default materialization
+      +materialized: view     # default materialization
     mdp_int:
       +schema: mdp_int
       +materialized: view

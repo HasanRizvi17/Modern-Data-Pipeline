@@ -1,0 +1,14 @@
+version: 2
+
+sources:
+  - name: mdp_raw
+    tables:
+      - name: mdp_orders_raw
+      - name: mdp_order_items_raw
+      - name: mdp_order_payments_raw
+      - name: mdp_order_reviews_raw
+      - name: mdp_customers_raw
+      - name: mdp_sellers_raw
+      - name: mdp_geolocation_raw
+      - name: mdp_products_raw
+      - name: mdp_product_category_name_translation_raw
