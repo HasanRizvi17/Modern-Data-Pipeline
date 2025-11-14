@@ -24,14 +24,17 @@ snapshot-paths: ["snapshots"]
 target-path: "target"                      # directory which will store compiled SQL files
 clean-targets: ["target", "dbt_packages"]  # directories to be removed by `dbt clean`
 
+
 models:
   modern_data_pipeline:
     mdp_ext:
       +schema: mdp_ext
       +materialized: view
+      +tags: ['mdp', 'extraction']
     mdp_stg:
-      +schema: mdp_stg        # all models in models/mdp_stg directory on dbt (mdp_stg dataset on BigQuery)
-      +materialized: view     # default materialization
+      +schema: mdp_stg          # save all models created in the models/mdp_stg directory on dbt in the mdp_stg dataset on BigQuery
+      +materialized: view       # default materialization for all models in this directory
+      +tags: ['mdp', 'staging'] # default tags for all models in this directory
     mdp_int:
       +schema: mdp_int
       +materialized: view
@@ -45,3 +48,5 @@ models:
       +schema: mdp_rep
       +materialized: view
     
+  elementary:
+    +schema: dq_tests_elementary  # save the models created in the elementary folder on dbt in the dq_tests_elementary dataset on BigQuery
