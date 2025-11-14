@@ -2,6 +2,17 @@ version: 2
 
 sources:
   - name: mdp_raw
+    description: "Raw data source for the marketplace data platform"
+    tags: ['mdp', 'raw']
+
+    #  Freshness test at source level (default for all source tables)
+    # freshness:
+    #   warn_after: {count: 24, period: hour}
+    #   error_after: {count: 48, period: hour}
+
+    # loaded_at_field: _etl_loaded_at
+
+    # source tables
     tables:
       - name: mdp_orders_raw
       - name: mdp_order_items_raw
@@ -12,3 +23,4 @@ sources:
       - name: mdp_geolocation_raw
       - name: mdp_products_raw
       - name: mdp_product_category_name_translation_raw
+        tags: ['lookup']

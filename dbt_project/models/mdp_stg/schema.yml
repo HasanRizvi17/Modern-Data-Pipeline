@@ -1,4 +1,98 @@
 version: 2
 
 models:
+
   - name: mdp_orders_stg
+    description: staging layer for orders data
+    tags: ['test']
+    columns:
+      - name: order_id
+        description: unique identifier of an order
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: unique identifier of a customer
+        tests:
+          - not_null
+
+  - name: mdp_order_items_stg
+    description: staging layer for order items data
+    tags: ['test']
+    columns:
+      - name: order_item_id
+        description: unique identifier of an order item
+        tests:
+          - unique
+          - not_null
+      - name: order_id
+        description: foreign key reference to orders
+        tests:
+          - not_null
+      - name: product_id
+        description: foreign key reference to products
+        tests:
+          - not_null
+      - name: seller_id
+        description: foreign key reference to sellers
+        tests:
+          - not_null
+
+  - name: mdp_order_payments_stg
+    description: staging layer for order payments data
+    columns:
+      - name: order_id
+        description: foreign key reference to orders
+        tests:
+          - not_null
+
+  - name: mdp_order_reviews_stg
+    description: staging layer for order reviews data
+    columns:
+      - name: review_id
+        description: unique identifier of a review
+        tests:
+          - not_null
+      - name: order_id
+        description: foreign key reference to orders
+        tests:
+          - not_null
+
+  - name: mdp_customers_stg
+    description: staging layer for customers data
+    columns:
+      - name: customer_unique_id # not unique
+        description: unique identifier of a customer
+        tests:
+          - unique
+          - not_null
+      - name: customer_id # unique
+        description: additional identifier of a customer (not unique)
+        tests:
+          - not_null
+      # zipcode, 5 characters length
+
+  - name: mdp_sellers_stg
+    description: staging layer for sellers data
+    columns:
+      - name: seller_id
+        description: unique identifier of a seller
+        tests:
+          - unique
+          - not_null
+
+  - name: mdp_geolocation_stg
+    description: staging layer for geolocation data
+
+  - name: mdp_products_stg
+    description: staging layer for products data
+    columns:
+      - name: product_id
+        description: unique identifier of a product
+        tests:
+          - unique
+          - not_null
+
+  - name: mdp_product_category_name_translation_stg
+    description: staging layer for product category name translation data
+    tags: ['lookup']
