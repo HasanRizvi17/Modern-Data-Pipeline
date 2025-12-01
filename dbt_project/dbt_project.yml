@@ -50,3 +50,6 @@ models:
     
   elementary:
     +schema: dq_tests_elementary  # save the models created in the elementary folder on dbt in the dq_tests_elementary dataset on BigQuery
+
+tests:
+  +severity: warn  # set default severity for tests to "warn" (options: "error", "warn")

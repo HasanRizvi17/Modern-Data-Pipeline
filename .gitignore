@@ -22,7 +22,7 @@ logs/
 .vscode/
 
 # Environment & Keys
-keys/*.json                # CONFIDENTIAL JSON keys for GCP service accounts
+keys/                
 .env                       # Environment variables file (often contains secrets)
 venv/                      # Virtual environment folder
 

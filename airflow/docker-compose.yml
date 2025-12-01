@@ -68,7 +68,8 @@ x-airflow-common:
     AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
     # WARNING: Use _PIP_ADDITIONAL_REQUIREMENTS option ONLY for a quick checks
     # for other purpose (development, test and especially production usage) build/extend Airflow image.
-    _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
+    _PIP_ADDITIONAL_REQUIREMENTS: dbt-bigquery==1.7.4
+    # _PIP_ADDITIONAL_REQUIREMENTS: "dbt-bigquery==1.7.4 dbt-core==1.10.5"
     # The following line can be used to set a custom config file, stored in the local config folder
     # If you want to use it, outcomment it and replace airflow.cfg with the name of your config file
     # AIRFLOW_CONFIG: '/opt/airflow/config/airflow.cfg'
@@ -77,6 +78,10 @@ x-airflow-common:
     - ./logs:/opt/airflow/logs
     - ./plugins:/opt/airflow/plugins
     - ../dbt_project:/opt/airflow/dbt_project # mounting our dbt project and letting airflow access dbt code
+    - ../keys:/opt/airflow/keys
+    # - ../keys/data-pipeline-17-dev-49bafa0f4dc1.json:/opt/airflow/keys/dev-key.json
+    
+    
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on

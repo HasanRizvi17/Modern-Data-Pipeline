@@ -7,7 +7,8 @@ modern_data_pipeline:
       project: data-pipeline-17-dev     # project id
       dataset: mdp_stg                  # default dataset where dbt will create tables in dev
       threads: 4                        # dbt will run up to 4 models in parallel
-      keyfile: "C:/Users/hasan/OneDrive - Higher Education Commission/PC Backup/0 Data Analytics Languages/Analytics Engineering - dbt/keys/data-pipeline-17-dev-49bafa0f4dc1.json"
+      keyfile: "../keys/data-pipeline-17-dev-49bafa0f4dc1.json"
+      # keyfile: "C:/Users/hasan/OneDrive - Higher Education Commission/PC Backup/0 Data Analytics Languages/Analytics Engineering - dbt/keys/data-pipeline-17-dev-49bafa0f4dc1.json"
       location: europe-west3
       # DEV_KEYFILE
       # JSON key file for service account
@@ -17,6 +18,7 @@ modern_data_pipeline:
       project: data-pipeline-17-prod
       dataset: mdp_stg
       threads: 4
-      keyfile: "C:/Users/hasan/OneDrive - Higher Education Commission/PC Backup/0 Data Analytics Languages/Analytics Engineering - dbt/keys/data-pipeline-17-prod-132483a883fa.json"
+      keyfile: "../keys/data-pipeline-17-prod-132483a883fa.json"
+      # keyfile: "C:/Users/hasan/OneDrive - Higher Education Commission/PC Backup/0 Data Analytics Languages/Analytics Engineering - dbt/keys/data-pipeline-17-prod-132483a883fa.json"
       location: europe-west3
       # PROD_KEYFILE
