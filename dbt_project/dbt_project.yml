@@ -27,12 +27,34 @@ clean-targets: ["target", "dbt_packages"]  # directories to be removed by `dbt c
 
 models:
   modern_data_pipeline:
+    # ----- DriveX Pipeline -----
+    staging:
+      drive:
+        +schema: drive_stg
+        +materialized: view
+        +tags: ['DriveX', 'staging']
+    intermediate:
+      drive:
+        +schema: drive_int
+        +materialized: view
+        +tags: ['DriveX', 'intermediate']
+    facts:
+      drive:
+        +schema: drive_fct
+        +materialized: view
+        +tags: ['DriveX', 'facts']
+    dimensions:
+      drive:
+        +schema: drive_dim
+        +materialized: view
+        +tags: ['DriveX', 'dimensions']
+    # ----- MDP Pipeline -----
     mdp_ext:
       +schema: mdp_ext
       +materialized: view
       +tags: ['mdp', 'extraction']
     mdp_stg:
-      +schema: mdp_stg          # save all models created in the models/mdp_stg directory on dbt in the mdp_stg dataset on BigQuery
+      +schema: mdp_stg          # schema refers to the dataset name on BigQuery (save all models created in the models/mdp_stg directory on dbt in the mdp_stg dataset on BigQuery)
       +materialized: view       # default materialization for all models in this directory
       +tags: ['mdp', 'staging'] # default tags for all models in this directory
     mdp_int:
