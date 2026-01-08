@@ -756,7 +756,7 @@ models:
         tests:
           - not_null
           - accepted_values:
-              values: ['open','in_progress','resolved','closed']
+              values: ['open','in_progress', 'escalated', 'resolved','closed']
 
       - name: channel
         tests:

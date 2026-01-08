@@ -48,6 +48,11 @@ models:
         +schema: drive_dim
         +materialized: view
         +tags: ['DriveX', 'dimensions']
+    marts:
+      # default settings for all marts folders
+      +schema: drive_mart
+      +materialized: view
+      +tags: ['DriveX', 'marts']
     # ----- MDP Pipeline -----
     mdp_ext:
       +schema: mdp_ext
