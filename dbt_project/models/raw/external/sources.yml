@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: external_data
+    description: "Raw tables containing data extracted from external sources such as public APIs used to help enrich DriveX analysis"
+    tags: ['external', 'raw']
+    tables:
+      - name: ext_fx_rates_raw
+        description: "Raw table containing weekly exchange rates of Euro (EUR) to US Dollar (USD), Canadian Dollar (CAD) and Great Britain Pound (GBP)."
+        columns:
+          - name: date
+            description: "The date for which the exchange rates are applicable."
+          - name: from_currency
+            description: "The base currency code (EUR)."
+          - name: to_currency
+            description: "The target currency code (USD, CAD, GBP)."
+          - name: rate
+            description: "The exchange rate from EUR to the target currency on the given date."

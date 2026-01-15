@@ -9,10 +9,12 @@ raw AS (
 
 extraction AS (
     SELECT
-        JSON_EXTRACT_SCALAR(data, '$.user_id') AS user_id,
-        JSON_EXTRACT_SCALAR(data, '$.promo_id') AS promo_id,
-        JSON_EXTRACT_SCALAR(data, '$.redeemed_at') AS redeemed_at,
-        JSON_EXTRACT_SCALAR(data, '$.created_at') AS created_at,
+        {{ json_extract_fields('data', [
+            {'name': 'user_id', 'path': '$.user_id'},
+            {'name': 'promo_id', 'path': '$.promo_id'},
+            {'name': 'redeemed_at', 'path': '$.redeemed_at'},
+            {'name': 'created_at', 'path': '$.created_at'}
+        ]) }},
         timestamp AS ingestion_timestamp
     FROM raw
 ),
@@ -21,8 +23,7 @@ type_casting AS (
     SELECT
         SAFE_CAST(user_id AS STRING) AS user_id,
         SAFE_CAST(promo_id AS STRING) AS promo_id,
-        DATETIME(TIMESTAMP(SAFE.PARSE_TIMESTAMP('%Y-%m-%dT%H:%M:%E*SZ', redeemed_at)), "Europe/Berlin") AS redeemed_at,
-        DATETIME(TIMESTAMP(SAFE.PARSE_TIMESTAMP('%Y-%m-%dT%H:%M:%E*SZ', created_at)), "Europe/Berlin") AS created_at,
+        {{ cast_iso_datetimes(['redeemed_at', 'created_at']) }},
         DATETIME(TIMESTAMP(ingestion_timestamp), "Europe/Berlin") AS ingestion_timestamp
     FROM extraction
 ),

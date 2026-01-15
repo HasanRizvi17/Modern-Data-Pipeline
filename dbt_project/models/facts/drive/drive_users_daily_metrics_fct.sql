@@ -17,13 +17,13 @@ SELECT
     
     -- rental metrics
     COUNT(DISTINCT rental_id) AS rentals_count,
-    ROUND(SUM(net_revenue)/COUNT(DISTINCT rental_id), 2) AS avg_revenue_per_rental,
+    ROUND(SUM(net_revenue_eur)/COUNT(DISTINCT rental_id), 2) AS avg_revenue_per_rental,
 
     -- payments / financials
-    SUM(gross_revenue) AS gross_revenue,
-    SUM(net_revenue) AS net_revenue,
-    SUM(discount_amount) AS discount_amount,
-    SUM(refunded_amount) AS refunded_amount,
+    SUM(gross_revenue_eur) AS gross_revenue,
+    SUM(net_revenue_eur) AS net_revenue,
+    SUM(discount_amount_eur) AS discount_amount,
+    SUM(refunded_amount_eur) AS refunded_amount,
     COUNT(DISTINCT CASE WHEN has_refund = TRUE THEN rental_id ELSE NULL END) AS rentals_with_refund,
 
     -- vehicle usage

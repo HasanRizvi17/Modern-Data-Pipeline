@@ -9,12 +9,14 @@ raw AS (
 
 extraction AS (
     SELECT
-        JSON_EXTRACT_SCALAR(data, '$.id') AS city_id,
-        JSON_EXTRACT_SCALAR(data, '$.name') AS city_name,
-        JSON_EXTRACT_SCALAR(data, '$.country_id') AS country_id,
-        JSON_EXTRACT_SCALAR(data, '$.timezone') AS timezone,
-        JSON_EXTRACT_SCALAR(data, '$.created_at') AS created_at,
-        JSON_EXTRACT_SCALAR(data, '$.updated_at') AS updated_at,
+        {{ json_extract_fields('data', [
+            {'name': 'city_id', 'path': '$.id'},
+            {'name': 'country_id', 'path': '$.country_id'},
+            {'name': 'city_name', 'path': '$.name'},
+            {'name': 'timezone', 'path': '$.timezone'},
+            {'name': 'created_at', 'path': '$.created_at'},
+            {'name': 'updated_at', 'path': '$.updated_at'}
+        ]) }},
         timestamp AS ingestion_timestamp
     FROM raw
 ),
@@ -22,11 +24,10 @@ extraction AS (
 type_casting AS (
     SELECT
         SAFE_CAST(city_id AS STRING) AS city_id,
-        SAFE_CAST(city_name AS STRING) AS city_name,
         SAFE_CAST(country_id AS STRING) AS country_id,
+        SAFE_CAST(city_name AS STRING) AS city_name,
         SAFE_CAST(timezone AS STRING) AS timezone,
-        DATETIME(TIMESTAMP(SAFE.PARSE_TIMESTAMP('%Y-%m-%dT%H:%M:%E*SZ', created_at)), "Europe/Berlin") AS created_at,
-        DATETIME(TIMESTAMP(SAFE.PARSE_TIMESTAMP('%Y-%m-%dT%H:%M:%E*SZ', updated_at)), "Europe/Berlin") AS updated_at,
+        {{ cast_iso_datetimes(['created_at', 'updated_at']) }},
         DATETIME(TIMESTAMP(ingestion_timestamp), "Europe/Berlin") AS ingestion_timestamp
     FROM extraction
 ),
@@ -34,9 +35,9 @@ type_casting AS (
 standardization AS (
     SELECT
         city_id,
-        NULLIF(TRIM(city_name), '') AS city_name,
         country_id,
-        NULLIF(TRIM(timezone), '') AS timezone,
+        {{ standardize_string('city_name', lower='no') }} AS city_name,
+        {{ standardize_string('timezone', lower='no') }} AS timezone,
         created_at,
         updated_at,
         ingestion_timestamp

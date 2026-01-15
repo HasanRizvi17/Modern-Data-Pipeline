@@ -1,0 +1,77 @@
+version: 2
+
+models:
+  - name: mkt_daily_promotions_performance_mart
+    description: >
+      Daily marketing mart analyzing promotion performance in the car-sharing
+      business. Aggregated at promotion-date-city-package level, this mart
+      tracks promotion redemptions, rental revenue, discount cost, and ROI to
+      evaluate promotional effectiveness across markets and travel patterns.
+
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - promo_id
+            - date
+            - start_city
+            - end_city
+            - is_inter_city_travel
+            - package_name
+
+      - dbt_utils.expression_is_true:
+          expression: "rentals >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "rental_revenue >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "discount_amount >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "rental_revenue >= discount_amount"
+
+      - dbt_utils.expression_is_true:
+          expression: "date <= CURRENT_DATE()"
+
+    columns:
+      - name: promo_id
+        description: Identifier of the promotion applied to rentals.
+        tests:
+          - not_null
+
+      - name: promo_code
+        description: Promotion code used by customers.
+
+      - name: discount_type
+        description: Type of discount applied by the promotion.
+
+      - name: date
+        description: Calendar date on which the promotion was redeemed.
+        tests:
+          - not_null
+
+      - name: start_city
+        description: City where the rental started.
+
+      - name: end_city
+        description: City where the rental ended.
+
+      - name: is_inter_city_travel
+        description: Indicates whether the rental involved travel between cities.
+
+      - name: package_name
+        description: "{{ doc('rental_package') }}"
+
+      - name: rentals
+        description: Number of distinct rentals where the promotion was redeemed.
+
+      - name: rental_revenue
+        description: Total rental revenue generated from rentals using the promotion.
+
+      - name: discount_amount
+        description: Total discount amount granted by the promotion on the date.
+
+      - name: roi
+        description: >
+          Return on investment of the promotion, calculated as
+          (rental_revenue - discount_amount) / discount_amount.

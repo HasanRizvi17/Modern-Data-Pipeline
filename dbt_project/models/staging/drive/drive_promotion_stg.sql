@@ -9,13 +9,15 @@ raw AS (
 
 extraction AS (
     SELECT
-        JSON_EXTRACT_SCALAR(data, '$.id') AS promo_id,
-        JSON_EXTRACT_SCALAR(data, '$.code') AS promo_code,
-        JSON_EXTRACT_SCALAR(data, '$.discount_amount') AS discount_amount,
-        JSON_EXTRACT_SCALAR(data, '$.discount_type') AS discount_type,
-        JSON_EXTRACT_SCALAR(data, '$.start_date') AS start_date,
-        JSON_EXTRACT_SCALAR(data, '$.end_date') AS end_date,
-        JSON_EXTRACT_SCALAR(data, '$.created_at') AS created_at,
+        {{ json_extract_fields('data', [
+            {'name': 'promo_id', 'path': '$.id'},
+            {'name': 'promo_code', 'path': '$.code'},
+            {'name': 'discount_amount', 'path': '$.discount_amount'},
+            {'name': 'discount_type', 'path': '$.discount_type'},
+            {'name': 'start_date', 'path': '$.start_date'},
+            {'name': 'end_date', 'path': '$.end_date'},
+            {'name': 'created_at', 'path': '$.created_at'}
+        ]) }},
         timestamp AS ingestion_timestamp
     FROM raw
 ),
@@ -28,7 +30,7 @@ type_casting AS (
         SAFE_CAST(discount_type AS STRING) AS discount_type,
         SAFE_CAST(start_date AS DATE) AS start_date,
         SAFE_CAST(end_date AS DATE) AS end_date,
-        DATETIME(TIMESTAMP(SAFE.PARSE_TIMESTAMP('%Y-%m-%dT%H:%M:%E*SZ', created_at)), "Europe/Berlin") AS created_at,
+        {{ cast_iso_datetimes(['created_at']) }},
         DATETIME(TIMESTAMP(ingestion_timestamp), "Europe/Berlin") AS ingestion_timestamp
     FROM extraction
 ),
@@ -36,9 +38,9 @@ type_casting AS (
 standardization AS (
     SELECT
         promo_id,
-        LOWER(TRIM(promo_code)) AS promo_code,
+        {{ standardize_string('promo_code') }} AS promo_code,
         discount_amount,
-        LOWER(TRIM(discount_type)) AS discount_type,
+        {{ standardize_string('discount_type') }} AS discount_type,
         start_date,
         end_date,
         created_at,

@@ -25,14 +25,14 @@ issues AS (
     FROM {{ ref('drive_rental_issues_int') }}
 ),
 
-cities AS (
-    SELECT *
-    FROM {{ ref('drive_city_stg') }}
-),
-
 users AS (
     SELECT *
     FROM {{ ref('drive_users_int') }}
+),
+
+fx_rates AS (
+    SELECT *
+    FROM {{ ref('ext_fx_rates_int') }}
 )
 
 SELECT
@@ -47,7 +47,6 @@ SELECT
     r.package_id,
     r.start_city_id,
     r.end_city_id,
-    vc.city_id AS vehicle_city_id,
     r.reservation_id,
     r.incident_id,
     r.promo_id,
@@ -73,9 +72,10 @@ SELECT
     r.reservation_end_at,
 
     -- dimensions
-    sc.city_name AS start_city,
-    ec.city_name AS end_city,
-    vc.city_name AS vehicle_city,
+    r.start_city,
+    r.end_city,
+    r.start_country,
+    r.end_country,
     r.is_inter_city_travel,
     r.rental_status,
     r.package_name,
@@ -93,15 +93,15 @@ SELECT
     r.distance_km,
 
     -- payments / financials
-    r.rental_cost,
-    f.paid_amount,
-    f.refunded_amount,
-    f.failed_amount,
-    f.wallet_paid_amount,
-    f.card_paid_amount,
-    f.discount_amount,
-    f.gross_revenue,
-    f.net_revenue,
+    {{ convert_to_euro('r.rental_cost', 'fx.rate') }} AS rental_cost_eur,
+    {{ convert_to_euro('f.paid_amount', 'fx.rate') }} AS paid_amount_eur,
+    {{ convert_to_euro('f.refunded_amount', 'fx.rate') }} AS refunded_amount_eur,
+    {{ convert_to_euro('f.failed_amount', 'fx.rate') }} AS failed_amount_eur,
+    {{ convert_to_euro('f.wallet_paid_amount', 'fx.rate') }} AS wallet_paid_amount_eur,
+    {{ convert_to_euro('f.card_paid_amount', 'fx.rate') }} AS card_paid_amount_eur,
+    {{ convert_to_euro('f.discount_amount', 'fx.rate') }} AS discount_amount_eur,
+    {{ convert_to_euro('f.gross_revenue', 'fx.rate') }} AS gross_revenue_eur,
+    {{ convert_to_euro('f.net_revenue', 'fx.rate') }} AS net_revenue_eur,
     f.has_refund,
     f.used_promotion,
 
@@ -139,7 +139,5 @@ LEFT JOIN vehicles AS v ON r.vehicle_id = v.vehicle_id
 LEFT JOIN payments AS f ON r.rental_id = f.rental_id
 LEFT JOIN ratings AS rt ON r.rental_id = rt.rental_id
 LEFT JOIN issues AS i ON r.rental_id = i.rental_id
-LEFT JOIN cities AS sc ON r.start_city_id = sc.city_id -- start city
-LEFT JOIN cities AS ec ON r.end_city_id = ec.city_id -- end city
-LEFT JOIN cities AS vc ON v.city_id = vc.city_id -- vehicle city
 LEFT JOIN users AS u ON r.user_id = u.user_id
+LEFT JOIN fx_rates AS fx ON DATE(r.end_time) = fx.date AND r.currency = fx.from_currency

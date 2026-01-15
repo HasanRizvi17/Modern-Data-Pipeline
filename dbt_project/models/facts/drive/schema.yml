@@ -1,0 +1,581 @@
+version: 2
+
+models:
+  - name: drive_rentals_fct
+    description: >
+      Fact table at rental grain (one row per rental_id). Combines rental lifecycle,
+      user snapshot, vehicle attributes, payments and revenue, ratings, support tickets,
+      and incidents to enable end-to-end rental analytics.
+
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - rental_id
+
+    columns:
+      - name: rental_id
+        description: Unique identifier for a rental.
+        tests:
+          - not_null
+          - unique
+
+      - name: user_id
+        description: Identifier of the user who performed the rental.
+        tests:
+          - not_null
+
+      - name: vehicle_id
+        description: Identifier of the vehicle rented.
+        tests:
+          - not_null
+
+      - name: model_id
+        description: Vehicle model identifier.
+
+      - name: fleet_id
+        description: Fleet identifier to which the vehicle belongs.
+
+      - name: package_id
+        description: Identifier of the rental package selected.
+
+      - name: start_city_id
+        description: City identifier where the rental started.
+
+      - name: end_city_id
+        description: City identifier where the rental ended.
+
+      - name: vehicle_city_id
+        description: City identifier where the vehicle is assigned.
+
+      - name: reservation_id
+        description: Identifier of the reservation linked to the rental, if any.
+
+      - name: incident_id
+        description: Identifier of the primary incident linked to the rental, if any.
+
+      - name: promo_id
+        description: Identifier of the promotion applied to the rental, if any.
+
+      - name: user_city_id
+        description: City identifier associated with the user at rental time.
+
+      - name: user_country_id
+        description: Country identifier associated with the user at rental time.
+
+      - name: user_market_id
+        description: Market identifier associated with the user at rental time.
+
+      - name: user_status
+        description: "{{ doc('user_status') }}"
+
+      - name: user_city
+        description: City name associated with the user.
+
+      - name: user_country
+        description: Country name associated with the user.
+
+      - name: user_market
+        description: Market name associated with the user.
+
+      - name: user_tenure_days
+        description: Number of days since user signup at rental time.
+
+      - name: user_tenure_days_group
+        description: Bucketed user tenure group.
+
+      - name: is_active_user
+        description: Indicates whether the user is considered active.
+
+      - name: is_validated_user
+        description: Indicates whether the user has completed validation.
+
+      - name: start_time
+        description: Timestamp when the rental started.
+
+      - name: end_time
+        description: Timestamp when the rental ended.
+
+      - name: start_date
+        description: Date when the rental started.
+
+      - name: end_date
+        description: Date when the rental ended.
+
+      - name: reserved_at
+        description: Timestamp when the rental was reserved.
+
+      - name: reservation_start_at
+        description: Scheduled start time of the reservation.
+
+      - name: reservation_end_at
+        description: Scheduled end time of the reservation.
+
+      - name: start_city
+        description: Name of the city where the rental started.
+
+      - name: end_city
+        description: Name of the city where the rental ended.
+
+      - name: vehicle_city
+        description: Name of the city where the vehicle is assigned.
+
+      - name: is_inter_city_travel
+        description: Indicates whether the rental involved travel between cities.
+
+      - name: rental_status
+        description: "{{ doc('rental_status') }}"
+
+      - name: package_name
+        description: "{{ doc('rental_package') }}"
+
+      - name: model_name
+        description: Vehicle model name.
+
+      - name: brand
+        description: Vehicle brand.
+
+      - name: energy_type
+        description: Energy type of the vehicle (e.g. electric, fuel).
+
+      - name: vehicle_segment
+        description: "{{ doc('vehicle_model_segment') }}"
+
+      - name: vehicle_seats
+        description: Number of seats in the vehicle.
+
+      - name: fleet_name
+        description: Name of the fleet the vehicle belongs to.
+
+      - name: company_type
+        description: "{{ doc('vehicle_fleet_company_type') }}"
+
+      - name: rental_duration_min
+        description: Total rental duration in minutes.
+
+      - name: rental_duration_hour
+        description: Total rental duration in hours.
+
+      - name: distance_km
+        description: Distance driven during the rental in kilometers.
+
+      - name: rental_cost_eur
+        description: Base cost of the rental before payments and adjustments.
+
+      - name: paid_amount_eur
+        description: Total successfully paid amount for the rental.
+
+      - name: refunded_amount_eur
+        description: Total refunded amount for the rental.
+
+      - name: failed_amount_eur
+        description: Total failed payment amount for the rental.
+
+      - name: wallet_paid_amount_eur
+        description: Portion of payment made via wallet.
+
+      - name: card_paid_amount_eur
+        description: Portion of payment made via card.
+
+      - name: discount_amount_eur
+        description: Discount amount applied to the rental.
+
+      - name: gross_revenue_eur
+        description: Gross revenue generated by the rental.
+
+      - name: net_revenue_eur
+        description: Net revenue after refunds and discounts.
+
+      - name: has_refund
+        description: Indicates whether the rental has any refund.
+
+      - name: used_promotion
+        description: Indicates whether a promotion was used on the rental.
+
+      - name: avg_rating_value
+        description: Average rating value received for the rental.
+
+      - name: rating_count
+        description: Number of ratings received for the rental.
+
+      - name: first_rating_delay_hours
+        description: Time in hours between rental end and first rating.
+
+      - name: is_5_star_rating
+        description: Indicates whether the rental received a 5-star rating.
+
+      - name: is_1_star_rating
+        description: Indicates whether the rental received a 1-star rating.
+
+      - name: ticket_support_rating
+        description: Support rating associated with tickets for the rental.
+
+      - name: ticket_count
+        description: Number of support tickets associated with the rental.
+
+      - name: has_support_ticket
+        description: Indicates whether the rental has any support ticket.
+
+      - name: ticket_has_escalation
+        description: Indicates whether any support ticket was escalated.
+
+      - name: ticket_first_response_at
+        description: Timestamp of the first support response.
+
+      - name: ticket_first_escalated_at
+        description: Timestamp of the first ticket escalation.
+
+      - name: ticket_resolved_at
+        description: Timestamp when the ticket was resolved.
+
+      - name: incident_count
+        description: Number of incidents associated with the rental.
+
+      - name: critical_incident_count
+        description: Number of critical incidents associated with the rental.
+
+      - name: incidents_with_police_report_filed
+        description: Number of incidents with police reports filed.
+
+      - name: incident_estimated_cost
+        description: Estimated total cost of incidents for the rental.
+
+      - name: has_incident
+        description: Indicates whether the rental has any incident.
+
+      - name: created_at
+        description: Timestamp when the rental record was created.
+
+      - name: created_date
+        description: Date when the rental record was created.
+
+      - name: updated_at
+        description: Timestamp when the rental record was last updated.
+
+      - name: ingestion_timestamp
+        description: Timestamp when the record was ingested into the warehouse.
+
+
+  - name: drive_support_tickets_fct
+    description: >
+      Fact table at support ticket grain (one row per ticket_id). Captures
+      support ticket attributes, linkage to rentals, lifecycle events,
+      escalation and reopen behavior, and response and resolution time metrics
+      for operational and SLA analysis.
+
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - ticket_id
+
+    columns:
+      - name: ticket_id
+        description: Unique identifier of the support ticket.
+        tests:
+          - not_null
+          - unique
+
+      - name: rental_id
+        description: Identifier of the rental associated with the ticket, if any.
+
+      - name: user_id
+        description: Identifier of the user who created the support ticket.
+        tests:
+          - not_null
+
+      - name: is_linked_to_rental
+        description: Indicates whether the ticket is linked to a rental.
+        tests:
+          - not_null
+
+      - name: category
+        description: "{{ doc('support_ticket_category') }}"
+
+      - name: subject
+        description: Subject or title of the support ticket.
+
+      - name: description
+        description: Detailed description provided in the support ticket.
+
+      - name: priority
+        description: "{{ doc('support_ticket_priority') }}"
+
+      - name: status
+        description: "{{ doc('support_ticket_status') }}"
+
+      - name: channel
+        description: "{{ doc('support_ticket_channel') }}"
+
+      - name: ticket_support_rating
+        description: Satisfaction rating provided for the support ticket, if any.
+
+      - name: reopen_count
+        description: Number of times the support ticket was reopened.
+
+      - name: escalation_count
+        description: Number of times the support ticket was escalated.
+
+      - name: first_response_at
+        description: Timestamp of the first response to the support ticket.
+
+      - name: first_escalated_at
+        description: Timestamp when the ticket was first escalated.
+
+      - name: resolved_at
+        description: Timestamp when the support ticket was resolved.
+
+      - name: first_response_time_minutes
+        description: Time in minutes between ticket creation and first response.
+
+      - name: first_response_time_hours
+        description: Time in hours between ticket creation and first response.
+
+      - name: resolution_time_minutes
+        description: Time in minutes between ticket creation and resolution.
+
+      - name: resolution_time_hours
+        description: Time in hours between ticket creation and resolution.
+
+      - name: resolved_within_24hrs
+        description: Indicates whether the ticket was resolved within 24 hours of creation.
+
+      - name: ticket_created_at
+        description: Timestamp when the support ticket was created.
+        tests:
+          - not_null
+
+      - name: ticket_updated_at
+        description: Timestamp when the support ticket was last updated.
+
+
+  - name: drive_incidents_fct
+    description: >
+      Fact table at incident grain (one row per incident_id). Captures incident
+      details, linkage to rentals, vehicles and users, severity and police
+      involvement, estimated cost, and time to resolution for operational
+      monitoring and risk analysis.
+
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - incident_id
+
+    columns:
+      - name: incident_id
+        description: Unique identifier of the incident.
+        tests:
+          - not_null
+          - unique
+
+      - name: rental_id
+        description: Identifier of the rental associated with the incident, if any.
+
+      - name: vehicle_id
+        description: Identifier of the vehicle involved in the incident.
+
+      - name: customer_id
+        description: Identifier of the user involved in the incident.
+        tests:
+          - not_null
+
+      - name: incident_status
+        description: "{{ doc('incident_status') }}"
+
+      - name: incident_type
+        description: "{{ doc('incident_type') }}"
+
+      - name: severity
+        description: "{{ doc('incident_severity') }}"
+
+      - name: description
+        description: Free-text description of the incident.
+
+      - name: police_report_filed
+        description: Indicates whether a police report was filed for the incident.
+
+      - name: estimated_cost
+        description: Estimated financial cost associated with the incident.
+
+      - name: reported_at
+        description: Timestamp when the incident was reported.
+        tests:
+          - not_null
+
+      - name: resolved_at
+        description: Timestamp when the incident was resolved.
+
+      - name: resolution_time_hours
+        description: Time in hours between incident report and resolution.
+
+      - name: created_at
+        description: Timestamp when the incident record was created.
+
+      - name: created_date
+        description: Date when the incident record was created.
+
+      - name: updated_at
+        description: Timestamp when the incident record was last updated.
+
+
+  - name: drive_rental_promotions_fct
+    description: >
+      Fact table capturing promotions applied to rentals. Each row represents
+      a promotion instance linked to a rental, including promotion attributes,
+      rental timing and location, and the realized discount amount in EUR.
+
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - promo_id
+            - rental_id
+
+    columns:
+      - name: promo_id
+        description: Unique identifier of the promotion.
+        tests:
+          - not_null
+
+      - name: promo_code
+        description: Normalized promotion code used by the customer.
+        tests:
+          - not_null
+
+      - name: discount_amount
+        description: Raw discount value defined in the promotion configuration.
+
+      - name: discount_type
+        description: Type of discount applied (e.g. percentage, fixed).
+        tests:
+          - not_null
+
+      - name: start_date
+        description: Date when the promotion becomes active.
+
+      - name: end_date
+        description: Date when the promotion expires.
+
+      - name: created_at
+        description: Timestamp when the promotion was created.
+
+      - name: rental_id
+        description: Identifier of the rental to which the promotion was applied.
+        tests:
+          - not_null
+
+      - name: start_time
+        description: Timestamp when the rental started.
+
+      - name: end_time
+        description: Timestamp when the rental ended.
+
+      - name: rental_cost
+        description: Base cost of the rental before discounts.
+
+      - name: start_city
+        description: City where the rental started.
+
+      - name: end_city
+        description: City where the rental ended.
+
+      - name: discount_amount_eur
+        description: >
+          Effective discount amount applied to the rental in EUR,
+          computed based on discount type and rental cost.
+
+
+  - name: drive_users_daily_metrics_fct
+    description: >
+      Daily aggregated fact table at user-day grain (one row per user per date).
+      Provides daily rental activity, revenue, usage, customer experience,
+      support, and incident metrics derived from rental-level facts.
+
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - user_id
+            - date
+
+    columns:
+      - name: user_id
+        description: Unique identifier of the user.
+        tests:
+          - not_null
+
+      - name: user_city
+        description: City associated with the user on the given day.
+
+      - name: user_country
+        description: Country associated with the user on the given day.
+
+      - name: user_market
+        description: Market associated with the user on the given day.
+
+      - name: user_tenure_days
+        description: Number of days since user signup on the given day.
+
+      - name: user_tenure_days_group
+        description: Bucketed user tenure group on the given day.
+
+      - name: date
+        description: Calendar date of the aggregated metrics.
+        tests:
+          - not_null
+
+      - name: rentals_count
+        description: Number of distinct rentals completed by the user on the date.
+
+      - name: avg_revenue_per_rental
+        description: Average net revenue per rental for the user on the date.
+
+      - name: gross_revenue
+        description: Total gross revenue generated by the user on the date.
+
+      - name: net_revenue
+        description: Total net revenue generated by the user on the date.
+
+      - name: discount_amount
+        description: Total discount amount applied to the user’s rentals on the date.
+
+      - name: refunded_amount
+        description: Total refunded amount for the user’s rentals on the date.
+
+      - name: rentals_with_refund
+        description: Number of rentals with at least one refund on the date.
+
+      - name: total_rental_duration_min
+        description: Total rental duration in minutes for the user on the date.
+
+      - name: total_rental_duration_hour
+        description: Total rental duration in hours for the user on the date.
+
+      - name: total_distance_km
+        description: Total distance traveled by the user on the date in kilometers.
+
+      - name: avg_rating_value
+        description: Average rating value across the user’s rentals on the date.
+
+      - name: rating_count
+        description: Total number of ratings received for the user’s rentals on the date.
+
+      - name: five_star_rentals
+        description: Number of rentals with a 5-star rating on the date.
+
+      - name: one_star_rentals
+        description: Number of rentals with a 1-star rating on the date.
+
+      - name: ticket_count
+        description: Total number of support tickets associated with the user’s rentals on the date.
+
+      - name: rentals_with_ticket
+        description: Number of rentals that had at least one support ticket on the date.
+
+      - name: rentals_with_ticket_escalation
+        description: Number of rentals that had at least one escalated support ticket on the date.
+
+      - name: incident_count
+        description: Total number of incidents associated with the user’s rentals on the date.
+
+      - name: critical_incident_count
+        description: Total number of critical incidents associated with the user’s rentals on the date.
+
+      - name: rentals_with_incident
+        description: Number of rentals that had at least one incident on the date.

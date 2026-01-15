@@ -9,13 +9,15 @@ raw AS (
 
 extraction AS (
     SELECT
-        JSON_EXTRACT_SCALAR(data, '$.id') AS model_id,
-        JSON_EXTRACT_SCALAR(data, '$.name') AS model_name,
-        JSON_EXTRACT_SCALAR(data, '$.brand') AS brand,
-        JSON_EXTRACT_SCALAR(data, '$.energy_type') AS energy_type,
-        JSON_EXTRACT_SCALAR(data, '$.segment') AS segment,
-        JSON_EXTRACT_SCALAR(data, '$.seats') AS seats,
-        JSON_EXTRACT_SCALAR(data, '$.created_at') AS created_at,
+        {{ json_extract_fields('data', [
+            {'name': 'model_id', 'path': '$.id'},
+            {'name': 'model_name', 'path': '$.name'},
+            {'name': 'brand', 'path': '$.brand'},
+            {'name': 'energy_type', 'path': '$.energy_type'},
+            {'name': 'segment', 'path': '$.segment'},
+            {'name': 'seats', 'path': '$.seats'},
+            {'name': 'created_at', 'path': '$.created_at'}
+        ]) }},
         timestamp AS ingestion_timestamp
     FROM raw
 ),
@@ -28,7 +30,7 @@ type_casting AS (
         SAFE_CAST(energy_type AS STRING) AS energy_type,
         SAFE_CAST(segment AS STRING) AS segment,
         SAFE_CAST(seats AS INT64) AS seats,
-        DATETIME(TIMESTAMP(SAFE.PARSE_TIMESTAMP('%Y-%m-%dT%H:%M:%E*SZ', created_at)), "Europe/Berlin") AS created_at,
+        {{ cast_iso_datetimes(['created_at']) }},
         DATETIME(TIMESTAMP(ingestion_timestamp), "Europe/Berlin") AS ingestion_timestamp
     FROM extraction
 ),
@@ -36,10 +38,10 @@ type_casting AS (
 standardization AS (
     SELECT
         model_id,
-        LOWER(TRIM(model_name)) AS model_name,
-        LOWER(TRIM(brand)) AS brand,
-        LOWER(TRIM(energy_type)) AS energy_type,
-        LOWER(TRIM(segment)) AS segment,
+        {{ standardize_string('model_name') }} AS model_name,
+        {{ standardize_string('brand') }} AS brand,
+        {{ standardize_string('energy_type') }} AS energy_type,
+        {{ standardize_string('segment') }} AS segment,
         COALESCE(seats, 0) AS seats,
         created_at,
         ingestion_timestamp

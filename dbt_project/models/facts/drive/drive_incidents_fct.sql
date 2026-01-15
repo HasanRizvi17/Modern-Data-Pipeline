@@ -12,6 +12,7 @@ SELECT
     rental_id,
     vehicle_id,
     user_id AS customer_id,
+    status AS incident_status,
     incident_type,
     severity,
     description,

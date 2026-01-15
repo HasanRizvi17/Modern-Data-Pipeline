@@ -9,11 +9,13 @@ raw AS (
 
 extraction AS (
     SELECT
-        JSON_EXTRACT_SCALAR(data, '$.id') AS package_id,
-        JSON_EXTRACT_SCALAR(data, '$.name') AS package_name,
-        JSON_EXTRACT_SCALAR(data, '$.active_from') AS active_from,
-        JSON_EXTRACT_SCALAR(data, '$.active_to') AS active_to,
-        JSON_EXTRACT_SCALAR(data, '$.created_at') AS created_at,
+        {{ json_extract_fields('data', [
+            {'name': 'package_id', 'path': '$.id'},
+            {'name': 'package_name', 'path': '$.name'},
+            {'name': 'active_from', 'path': '$.active_from'},
+            {'name': 'active_to', 'path': '$.active_to'},
+            {'name': 'created_at', 'path': '$.created_at'}
+        ]) }},
         timestamp AS ingestion_timestamp
     FROM raw
 ),
@@ -22,9 +24,7 @@ type_casting AS (
     SELECT
         SAFE_CAST(package_id AS STRING) AS package_id,
         SAFE_CAST(package_name AS STRING) AS package_name,
-        DATETIME(TIMESTAMP(SAFE.PARSE_TIMESTAMP('%Y-%m-%dT%H:%M:%E*SZ', active_from)), "Europe/Berlin") AS active_from,
-        DATETIME(TIMESTAMP(SAFE.PARSE_TIMESTAMP('%Y-%m-%dT%H:%M:%E*SZ', active_to)), "Europe/Berlin") AS active_to,
-        DATETIME(TIMESTAMP(SAFE.PARSE_TIMESTAMP('%Y-%m-%dT%H:%M:%E*SZ', created_at)), "Europe/Berlin") AS created_at,
+        {{ cast_iso_datetimes(['active_from', 'active_to', 'created_at']) }},
         DATETIME(TIMESTAMP(ingestion_timestamp), "Europe/Berlin") AS ingestion_timestamp
     FROM extraction
 ),
@@ -32,7 +32,7 @@ type_casting AS (
 standardization AS (
     SELECT
         package_id,
-        LOWER(TRIM(package_name)) AS package_name,
+        {{ standardize_string('package_name') }} AS package_name,
         active_from,
         active_to,
         created_at,

@@ -1,0 +1,410 @@
+version: 2
+
+models:
+  - name: ops_incidents_self_serve_mart
+    description: >
+      Operations self-serve mart providing a 360-degree view of incidents enriched
+      with rental, vehicle, financial, and rating context. Designed for operational
+      analysis, risk monitoring, root-cause investigation, and incident cost
+      assessment in a car-sharing business.
+
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - incident_id
+
+      - dbt_utils.expression_is_true:
+          expression: "incident_created_at <= CURRENT_TIMESTAMP()"
+
+      - dbt_utils.expression_is_true:
+          expression: "incident_updated_at >= incident_created_at"
+
+      - dbt_utils.expression_is_true:
+          expression: "estimated_cost IS NULL OR estimated_cost >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "rental_duration_min IS NULL OR rental_duration_min >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "net_revenue IS NULL OR net_revenue <= gross_revenue"
+
+    columns:
+      # -----------------------
+      # Incident core attributes
+      # -----------------------
+      - name: incident_id
+        description: Unique identifier of the incident.
+        tests:
+          - not_null
+
+      - name: rental_id
+        description: Identifier of the rental associated with the incident, if any.
+
+      - name: vehicle_id
+        description: Identifier of the vehicle involved in the incident.
+
+      - name: customer_id
+        description: Identifier of the user involved in the incident.
+
+      - name: incident_type
+        description: "{{ doc('incident_type') }}"
+
+      - name: severity
+        description: "{{ doc('incident_severity') }}"
+
+      - name: description
+        description: Free-text description of the incident.
+
+      - name: police_report_filed
+        description: Indicates whether a police report was filed.
+
+      - name: estimated_cost
+        description: Estimated financial cost associated with the incident.
+
+      - name: reported_at
+        description: Timestamp when the incident was reported.
+
+      - name: resolved_at
+        description: Timestamp when the incident was resolved.
+
+      - name: resolution_time_hours
+        description: Time in hours between incident report and resolution.
+
+      # -----------------------
+      # Rental & vehicle IDs
+      # -----------------------
+      - name: model_id
+        description: Identifier of the vehicle model.
+
+      - name: fleet_id
+        description: Identifier of the fleet to which the vehicle belongs.
+
+      - name: package_id
+        description: Identifier of the rental package.
+
+      - name: start_city_id
+        description: City identifier where the rental started.
+
+      - name: end_city_id
+        description: City identifier where the rental ended.
+
+      - name: reservation_id
+        description: Identifier of the reservation linked to the rental.
+
+      - name: promo_id
+        description: Identifier of the promotion applied to the rental, if any.
+
+      # -----------------------
+      # Rental attributes
+      # -----------------------
+      - name: start_time
+        description: Timestamp when the rental started.
+
+      - name: end_time
+        description: Timestamp when the rental ended.
+
+      - name: start_city
+        description: Name of the city where the rental started.
+
+      - name: end_city
+        description: Name of the city where the rental ended.
+
+      - name: is_inter_city_travel
+        description: Indicates whether the rental involved inter-city travel.
+
+      - name: rental_status
+        description: "{{ doc('rental_status') }}"
+
+      - name: package_name
+        description: "{{ doc('rental_package') }}"
+
+      - name: model_name
+        description: Vehicle model name.
+
+      - name: brand
+        description: Vehicle brand.
+
+      - name: energy_type
+        description: Energy type of the vehicle.
+
+      - name: vehicle_segment
+        description: "{{ doc('vehicle_model_segment') }}"
+
+      - name: vehicle_seats
+        description: Number of seats in the vehicle.
+
+      - name: fleet_name
+        description: Name of the fleet to which the vehicle belongs.
+
+      - name: company_type
+        description: "{{ doc('vehicle_fleet_company_type') }}"
+
+      # -----------------------
+      # Usage & financials
+      # -----------------------
+      - name: rental_duration_min
+        description: Rental duration in minutes.
+
+      - name: rental_duration_hour
+        description: Rental duration in hours.
+
+      - name: distance_km
+        description: Distance traveled during the rental in kilometers.
+
+      - name: rental_cost
+        description: Base cost of the rental.
+
+      - name: paid_amount
+        description: Total amount successfully paid for the rental.
+
+      - name: refunded_amount
+        description: Total refunded amount for the rental.
+
+      - name: failed_amount
+        description: Total failed payment amount for the rental.
+
+      - name: wallet_paid_amount
+        description: Portion of payment made via wallet.
+
+      - name: card_paid_amount
+        description: Portion of payment made via card.
+
+      - name: discount_amount
+        description: Discount amount applied to the rental.
+
+      - name: gross_revenue
+        description: Gross revenue generated by the rental.
+
+      - name: net_revenue
+        description: Net revenue after discounts and refunds.
+
+      - name: has_refund
+        description: Indicates whether the rental has any refund.
+
+      - name: used_promotion
+        description: Indicates whether a promotion was used on the rental.
+
+      # -----------------------
+      # Ratings
+      # -----------------------
+      - name: avg_rating_value
+        description: Average rating value received for the rental.
+
+      - name: rating_count
+        description: Number of ratings received for the rental.
+
+      - name: is_5_star_rating
+        description: Indicates whether the rental received a 5-star rating.
+
+      - name: is_1_star_rating
+        description: Indicates whether the rental received a 1-star rating.
+
+      # -----------------------
+      # Incident timestamps
+      # -----------------------
+      - name: incident_created_at
+        description: Timestamp when the incident record was created.
+
+      - name: incident_updated_at
+        description: Timestamp when the incident record was last updated.
+
+
+  - name: ops_daily_incidents_mart
+    description: >
+      Operations daily incident KPI mart for the car-sharing business. Aggregated
+      at date and incident attribute level, this mart supports both creation-date
+      and resolution-date analyses to monitor incident volume, severity mix,
+      police involvement, resolution performance, and estimated cost, with
+      rental context for incident rate calculations in BI tools.
+
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - date_type
+            - date
+            - incident_type
+            - severity
+            - police_report_filed
+
+      - dbt_utils.expression_is_true:
+          expression: "total_incidents >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "resolved_incidents >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "open_incidents >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "resolved_incidents <= total_incidents"
+
+      - dbt_utils.expression_is_true:
+          expression: "open_incidents <= total_incidents"
+
+      - dbt_utils.expression_is_true:
+          expression: "total_estimated_cost IS NULL OR total_estimated_cost >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "date <= CURRENT_DATE()"
+
+    columns:
+      - name: date_type
+        description: Indicates whether KPIs are aggregated by incident creation date or resolution date.
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['created', 'resolved']
+
+      - name: date
+        description: Calendar date used for aggregating incident KPIs.
+        tests:
+          - not_null
+
+      - name: incident_type
+        description: "{{ doc('incident_type') }}"
+
+      - name: severity
+        description: "{{ doc('incident_severity') }}"
+
+      - name: police_report_filed
+        description: Indicates whether a police report was filed for the incidents.
+
+      - name: total_incidents
+        description: Total number of incidents for the given date and dimensions.
+
+      - name: resolved_incidents
+        description: Number of incidents resolved for the given date and dimensions.
+
+      - name: open_incidents
+        description: Number of incidents not resolved for the given date and dimensions.
+
+      - name: avg_resolution_time_hours
+        description: Average time in hours taken to resolve incidents.
+
+      - name: total_estimated_cost
+        description: Total estimated financial cost associated with incidents.
+
+      - name: rentals_with_incidents
+        description: Number of distinct rentals that had at least one incident on the date.
+
+      - name: total_rentals
+        description: Total number of rentals on the corresponding date, used to compute incident rates in BI tools.
+
+
+  - name: ops_daily_vehicle_utilization_mart
+    description: >
+      Operations mart providing daily vehicle-level utilization and performance
+      metrics in the car-sharing business. Aggregated at vehicle-day grain, this
+      mart enables fleet utilization analysis, distance and time usage tracking,
+      revenue contribution, and incident and support load monitoring across
+      vehicles, fleets, and markets.
+
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - vehicle_id
+            - date
+
+      - dbt_utils.expression_is_true:
+          expression: "rentals_count >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "total_rental_duration_min >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "total_rental_duration_hour >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "total_distance_km >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "gross_revenue >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "net_revenue <= gross_revenue"
+
+      - dbt_utils.expression_is_true:
+          expression: "date <= CURRENT_DATE()"
+
+    columns:
+      # -----------------------
+      # Identifiers
+      # -----------------------
+      - name: vehicle_id
+        description: Unique identifier of the vehicle.
+        tests:
+          - not_null
+
+      - name: model_id
+        description: Identifier of the vehicle model.
+
+      - name: fleet_id
+        description: Identifier of the fleet to which the vehicle belongs.
+
+      - name: date
+        description: Calendar date on which vehicle utilization is measured.
+        tests:
+          - not_null
+
+      # -----------------------
+      # Vehicle attributes
+      # -----------------------
+      - name: vehicle_city
+        description: City where the vehicle is assigned.
+
+      - name: model_name
+        description: Name of the vehicle model.
+
+      - name: brand
+        description: Vehicle brand.
+
+      - name: energy_type
+        description: Energy type of the vehicle.
+
+      - name: vehicle_segment
+        description: "{{ doc('vehicle_model_segment') }}"
+
+      - name: vehicle_seats
+        description: Number of seats in the vehicle.
+
+      - name: fleet_name
+        description: Name of the fleet to which the vehicle belongs.
+
+      - name: company_type
+        description: "{{ doc('vehicle_fleet_company_type') }}"
+
+      # -----------------------
+      # Utilization metrics
+      # -----------------------
+      - name: rentals_count
+        description: Number of rentals completed by the vehicle on the date.
+
+      - name: total_rental_duration_min
+        description: Total rental duration in minutes for the vehicle on the date.
+
+      - name: total_rental_duration_hour
+        description: Total rental duration in hours for the vehicle on the date.
+
+      - name: total_distance_km
+        description: Total distance traveled by the vehicle on the date in kilometers.
+
+      # -----------------------
+      # Revenue metrics
+      # -----------------------
+      - name: gross_revenue
+        description: Total gross revenue generated by the vehicle on the date.
+
+      - name: net_revenue
+        description: Total net revenue generated by the vehicle on the date.
+
+      # -----------------------
+      # Incidents & support
+      # -----------------------
+      - name: incident_count
+        description: Total number of incidents associated with the vehicle on the date.
+
+      - name: critical_incident_count
+        description: Total number of critical incidents associated with the vehicle on the date.
+
+      - name: ticket_count
+        description: Total number of support tickets associated with the vehicle on the date.

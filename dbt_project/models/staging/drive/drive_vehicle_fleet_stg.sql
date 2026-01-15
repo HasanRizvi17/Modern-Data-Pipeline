@@ -9,11 +9,13 @@ raw AS (
 
 extraction AS (
     SELECT
-        JSON_EXTRACT_SCALAR(data, '$.id') AS fleet_id,
-        JSON_EXTRACT_SCALAR(data, '$.name') AS fleet_name,
-        JSON_EXTRACT_SCALAR(data, '$.company_type') AS company_type,
-        JSON_EXTRACT_SCALAR(data, '$.city_id') AS city_id,
-        JSON_EXTRACT_SCALAR(data, '$.created_at') AS created_at,
+        {{ json_extract_fields('data', [
+            {'name': 'fleet_id', 'path': '$.id'},
+            {'name': 'fleet_name', 'path': '$.name'},
+            {'name': 'company_type', 'path': '$.company_type'},
+            {'name': 'city_id', 'path': '$.city_id'},
+            {'name': 'created_at', 'path': '$.created_at'}
+        ]) }},
         timestamp AS ingestion_timestamp
     FROM raw
 ),
@@ -24,7 +26,7 @@ type_casting AS (
         SAFE_CAST(fleet_name AS STRING) AS fleet_name,
         SAFE_CAST(company_type AS STRING) AS company_type,
         SAFE_CAST(city_id AS STRING) AS city_id,
-        DATETIME(TIMESTAMP(SAFE.PARSE_TIMESTAMP('%Y-%m-%dT%H:%M:%E*SZ', created_at)), "Europe/Berlin") AS created_at,
+        {{ cast_iso_datetimes(['created_at']) }},
         DATETIME(TIMESTAMP(ingestion_timestamp), "Europe/Berlin") AS ingestion_timestamp
     FROM extraction
 ),
@@ -32,8 +34,8 @@ type_casting AS (
 standardization AS (
     SELECT
         fleet_id,
-        NULLIF(TRIM(fleet_name), '') AS fleet_name,
-        LOWER(TRIM(company_type)) AS company_type,
+        {{ standardize_string('fleet_name', lower='no') }} AS fleet_name,
+        {{ standardize_string('company_type') }} AS company_type,
         city_id,
         created_at,
         ingestion_timestamp
