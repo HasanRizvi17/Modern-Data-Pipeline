@@ -3,7 +3,7 @@ version: 2
 sources:
   - name: drive_raw
     description: "Raw tables containing JSON data ingested from the DriveX database on MongoDB"
-    tags: ['drive', 'raw']
+    tags: ['DriveX', 'raw']
 
     #  Freshness test at source level (default for all source tables)
     # freshness:
@@ -14,20 +14,38 @@ sources:
     # source tables
     tables:
       - name: drive_city_raw
+        description: "Raw table containing JSON data for citiesingested from the DriveX database on MongoDB"
       - name: drive_country_raw
+        description: "Raw table containing JSON data for countries ingested from the DriveX database on MongoDB"
       - name: drive_market_raw
+        description: "Raw table containing JSON data for markets ingested from the DriveX database on MongoDB"
       - name: drive_user_raw
+        description: "Raw table containing JSON data for users ingested from the DriveX database on MongoDB"
       - name: drive_vehicle_model_raw
+        description: "Raw table containing JSON data for vehicle models ingested from the DriveX database on MongoDB"
       - name: drive_vehicle_fleet_raw
+        description: "Raw table containing JSON data for vehicle fleets ingested from the DriveX database on MongoDB"
       - name: drive_vehicle_raw
+        description: "Raw table containing JSON data for vehicles ingested from the DriveX database on MongoDB"
       - name: drive_trip_package_raw
+        description: "Raw table containing JSON data for trip packages ingested from the DriveX database on MongoDB"
       - name: drive_promotion_raw
+        description: "Raw table containing JSON data for promotions ingested from the DriveX database on MongoDB"
       - name: drive_user_promotion_raw
+        description: "Raw table containing JSON data for user promotions ingested from the DriveX database on MongoDB"
       - name: drive_reservation_raw
+        description: "Raw table containing JSON data for reservations ingested from the DriveX database on MongoDB"
       - name: drive_rental_raw
+        description: "Raw table containing JSON data for rentals ingested from the DriveX database on MongoDB"
       - name: drive_rental_rating_raw
+        description: "Raw table containing JSON data for rental ratings ingested from the DriveX database on MongoDB"
       - name: drive_payment_raw
+        description: "Raw table containing JSON data for payments ingested from the DriveX database on MongoDB"
       - name: drive_refund_raw
+        description: "Raw table containing JSON data for refunds ingested from the DriveX database on MongoDB"
       - name: drive_incident_raw
+        description: "Raw table containing JSON data for incidents ingested from the DriveX database on MongoDB"
       - name: drive_support_ticket_raw
+        description: "Raw table containing JSON data for support tickets ingested from the DriveX database on MongoDB"
       - name: drive_ticket_history_raw
+        description: "Raw table containing JSON data for ticket histories ingested from the DriveX database on MongoDB"

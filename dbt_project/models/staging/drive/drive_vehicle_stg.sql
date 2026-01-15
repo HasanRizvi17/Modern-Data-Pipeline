@@ -9,15 +9,17 @@ raw AS (
 
 extraction AS (
     SELECT
-        JSON_EXTRACT_SCALAR(data, '$.id') AS vehicle_id,
-        JSON_EXTRACT_SCALAR(data, '$.city_id') AS city_id,
-        JSON_EXTRACT_SCALAR(data, '$.model_id') AS model_id,
-        JSON_EXTRACT_SCALAR(data, '$.fleet_id') AS fleet_id,
-        JSON_EXTRACT_SCALAR(data, '$.status') AS status,
-        JSON_EXTRACT_SCALAR(data, '$.battery_level') AS battery_level,
-        JSON_EXTRACT_SCALAR(data, '$.fuel_level') AS fuel_level,
-        JSON_EXTRACT_SCALAR(data, '$.created_at') AS created_at,
-        JSON_EXTRACT_SCALAR(data, '$.updated_at') AS updated_at,
+        {{ json_extract_fields('data', [
+            {'name': 'vehicle_id', 'path': '$.id'},
+            {'name': 'city_id', 'path': '$.city_id'},
+            {'name': 'model_id', 'path': '$.model_id'},
+            {'name': 'fleet_id', 'path': '$.fleet_id'},
+            {'name': 'status', 'path': '$.status'},
+            {'name': 'battery_level', 'path': '$.battery_level'},
+            {'name': 'fuel_level', 'path': '$.fuel_level'},
+            {'name': 'created_at', 'path': '$.created_at'},
+            {'name': 'updated_at', 'path': '$.updated_at'}
+        ]) }},
         timestamp AS ingestion_timestamp
     FROM raw
 ),
@@ -31,8 +33,7 @@ type_casting AS (
         SAFE_CAST(status AS STRING) AS status,
         SAFE_CAST(battery_level AS INT64) AS battery_level,
         SAFE_CAST(fuel_level AS INT64) AS fuel_level,
-        DATETIME(TIMESTAMP(SAFE.PARSE_TIMESTAMP('%Y-%m-%dT%H:%M:%E*SZ', created_at)), "Europe/Berlin") AS created_at,
-        DATETIME(TIMESTAMP(SAFE.PARSE_TIMESTAMP('%Y-%m-%dT%H:%M:%E*SZ', updated_at)), "Europe/Berlin") AS updated_at,
+        {{ cast_iso_datetimes(['created_at', 'updated_at']) }},
         DATETIME(TIMESTAMP(ingestion_timestamp), "Europe/Berlin") AS ingestion_timestamp
     FROM extraction
 ),
@@ -43,7 +44,7 @@ standardization AS (
         city_id,
         model_id,
         fleet_id,
-        LOWER(TRIM(status)) AS status,
+        {{ standardize_string('status') }} AS status,
         COALESCE(battery_level, 0) AS battery_level,
         COALESCE(fuel_level, 0) AS fuel_level,
         created_at,

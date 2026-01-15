@@ -9,11 +9,13 @@ raw AS (
 
 extraction AS (
     SELECT
-        JSON_EXTRACT_SCALAR(data, '$.id') AS refund_id,
-        JSON_EXTRACT_SCALAR(data, '$.payment_id') AS payment_id,
-        JSON_EXTRACT_SCALAR(data, '$.amount') AS amount,
-        JSON_EXTRACT_SCALAR(data, '$.reason') AS reason,
-        JSON_EXTRACT_SCALAR(data, '$.created_at') AS created_at,
+        {{ json_extract_fields('data', [
+            {'name': 'refund_id', 'path': '$.id'},
+            {'name': 'payment_id', 'path': '$.payment_id'},
+            {'name': 'amount', 'path': '$.amount'},
+            {'name': 'reason', 'path': '$.reason'},
+            {'name': 'created_at', 'path': '$.created_at'} 
+        ]) }},
         timestamp AS ingestion_timestamp
     FROM raw
 ),
@@ -24,7 +26,7 @@ type_casting AS (
         SAFE_CAST(payment_id AS STRING) AS payment_id,
         SAFE_CAST(amount AS FLOAT64) AS amount,
         SAFE_CAST(reason AS STRING) AS reason,
-        DATETIME(TIMESTAMP(SAFE.PARSE_TIMESTAMP('%Y-%m-%dT%H:%M:%E*SZ', created_at)), "Europe/Berlin") AS created_at,
+        {{ cast_iso_datetimes(['created_at']) }},
         DATETIME(TIMESTAMP(ingestion_timestamp), "Europe/Berlin") AS ingestion_timestamp
     FROM extraction
 ),
@@ -34,7 +36,7 @@ standardization AS (
         refund_id,
         payment_id,
         COALESCE(amount, 0) AS amount,
-        NULLIF(TRIM(reason), '') AS reason,
+        {{ standardize_string('reason') }} AS reason,
         created_at,
         ingestion_timestamp
     FROM type_casting

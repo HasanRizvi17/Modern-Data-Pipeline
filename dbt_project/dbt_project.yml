@@ -21,6 +21,7 @@ test-paths: ["tests"]
 seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
+docs-paths: ["docs"]
 target-path: "target"                      # directory which will store compiled SQL files
 clean-targets: ["target", "dbt_packages"]  # directories to be removed by `dbt clean`
 
@@ -30,14 +31,22 @@ models:
     # ----- DriveX Pipeline -----
     staging:
       drive:
-        +schema: drive_stg
+        +schema: drive_stg                 # schema refers to the dataset name on BigQuery (save all models created in the models/mdp_stg directory on dbt in the mdp_stg dataset on BigQuery)
+        +materialized: view                # default materialization for all models in this directory
+        +tags: ['DriveX', 'staging']       # default tags for all models in this directory
+      external:
+        +schema: external_stg
         +materialized: view
-        +tags: ['DriveX', 'staging']
+        +tags: ['External', 'staging']
     intermediate:
       drive:
         +schema: drive_int
-        +materialized: view
+        +materialized: table
         +tags: ['DriveX', 'intermediate']
+      external:
+        +schema: external_int
+        +materialized: table
+        +tags: ['External', 'intermediate']
     facts:
       drive:
         +schema: drive_fct
@@ -53,27 +62,6 @@ models:
       +schema: drive_mart
       +materialized: view
       +tags: ['DriveX', 'marts']
-    # ----- MDP Pipeline -----
-    mdp_ext:
-      +schema: mdp_ext
-      +materialized: view
-      +tags: ['mdp', 'extraction']
-    mdp_stg:
-      +schema: mdp_stg          # schema refers to the dataset name on BigQuery (save all models created in the models/mdp_stg directory on dbt in the mdp_stg dataset on BigQuery)
-      +materialized: view       # default materialization for all models in this directory
-      +tags: ['mdp', 'staging'] # default tags for all models in this directory
-    mdp_int:
-      +schema: mdp_int
-      +materialized: view
-    mdp_fct:
-      +schema: mdp_fct
-      +materialized: view
-    mdp_dim:
-      +schema: mdp_dim
-      +materialized: view
-    mdp_rep:
-      +schema: mdp_rep
-      +materialized: view
     
   elementary:
     +schema: dq_tests_elementary  # save the models created in the elementary folder on dbt in the dq_tests_elementary dataset on BigQuery

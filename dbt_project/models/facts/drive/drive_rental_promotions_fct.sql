@@ -20,7 +20,7 @@ promotions_applied AS (
         pr.* EXCEPT(ingestion_timestamp), 
         r.rental_id, r.start_time, r.end_time, r.rental_cost, 
         sc.city_name AS start_city, ec.city_name AS end_city,
-        {{ apply_discount('pr.discount_type', 'pr.discount_amount', 'r.rental_cost') }} AS discount_amount_eur
+        {{ apply_discount('pr.discount_type', 'pr.discount_amount', 'r.rental_cost') }} AS discount_amount
     FROM promotions AS pr
     LEFT JOIN rentals AS r ON r.promo_id = pr.promo_id
     LEFT JOIN cities AS sc ON r.start_city_id = sc.city_id

@@ -1,0 +1,343 @@
+version: 2
+
+models:
+
+  - name: dates_dim
+    description: >
+      Date dimension providing calendar attributes for time-based analysis.
+      One row per calendar date.
+
+    columns:
+      - name: date
+        description: Calendar date
+        tests:
+          - not_null
+          - unique
+
+      - name: year
+        description: Calendar year of the date
+        tests:
+          - not_null
+
+      - name: month
+        description: Calendar month number of the date
+        tests:
+          - not_null
+
+      - name: day
+        description: Day of month of the date
+        tests:
+          - not_null
+
+      - name: iso_week
+        description: ISO week number of the date
+        tests:
+          - not_null
+
+      - name: iso_year
+        description: ISO year corresponding to the ISO week
+        tests:
+          - not_null
+
+      - name: week_start_date
+        description: Start date of the ISO week
+        tests:
+          - not_null
+
+      - name: month_start_date
+        description: Start date of the calendar month
+        tests:
+          - not_null
+
+      - name: quarter_start_date
+        description: Start date of the calendar quarter
+        tests:
+          - not_null
+
+      - name: year_start_date
+        description: Start date of the calendar year
+        tests:
+          - not_null
+
+      - name: day_name
+        description: Name of the day of the week
+
+      - name: month_name
+        description: Name of the calendar month
+
+      - name: is_weekend
+        description: Boolean flag indicating whether the date falls on a weekend
+
+
+  - name: drive_cities_dim
+    description: >
+      Dimension table representing cities enriched with country and market context.
+      One row per city.
+
+    columns:
+      - name: city_id
+        description: Unique identifier of the city
+        tests:
+          - not_null
+          - unique
+
+      - name: city
+        description: Name of the city
+        tests:
+          - not_null
+
+      - name: country
+        description: Name of the country associated with the city
+        tests:
+          - not_null
+
+      - name: iso_code
+        description: ISO alpha-2 country code associated with the city
+        tests:
+          - not_null
+
+      - name: market
+        description: Name of the market the city belongs to
+        tests:
+          - not_null
+
+      - name: created_at
+        description: Timestamp at which the city was created
+        tests:
+          - not_null
+
+      - name: created_date
+        description: Date at which the city was created
+        tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp at which the city was last updated
+
+      - name: ingestion_timestamp
+        description: Timestamp at which the city record was ingested into the analytics warehouse
+        tests:
+          - not_null
+
+
+  - name: drive_promotions_dim
+    description: >
+      Dimension table representing promotional campaigns available to users.
+      One row per promotion.
+
+    columns:
+      - name: promo_id
+        description: Unique identifier of the promotion
+        tests:
+          - not_null
+          - unique
+
+      - name: promo_code
+        description: Promotion code used by users
+        tests:
+          - not_null
+
+      - name: discount_amount
+        description: Discount value applied by the promotion
+        tests:
+          - not_null
+
+      - name: discount_type
+        description: Type of discount applied by the promotion
+        tests:
+          - not_null
+
+      - name: start_date
+        description: Date from which the promotion is active
+        tests:
+          - not_null
+
+      - name: end_date
+        description: Date until which the promotion is active
+
+      - name: created_at
+        description: Timestamp at which the promotion was created
+        tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp at which the promotion was last updated
+
+      - name: ingestion_timestamp
+        description: Timestamp at which the promotion record was ingested into the analytics warehouse
+        tests:
+          - not_null
+
+
+  - name: drive_users_dim
+    description: >
+      Dimension table representing users enriched with geographic and tenure attributes.
+      One row per user.
+
+    columns:
+      - name: user_id
+        description: Unique identifier of the user
+        tests:
+          - not_null
+          - unique
+
+      - name: city_id
+        description: Unique identifier of the city associated with the user
+        tests:
+          - not_null
+
+      - name: country_id
+        description: Unique identifier of the country associated with the user
+        tests:
+          - not_null
+
+      - name: market_id
+        description: Unique identifier of the market associated with the user
+        tests:
+          - not_null
+
+      - name: user_email
+        description: Email address associated with the user account
+        tests:
+          - not_null
+
+      - name: user_status
+        description: "{{ doc('user_status') }}"
+        tests:
+          - not_null
+
+      - name: city
+        description: Name of the city associated with the user
+        tests:
+          - not_null
+
+      - name: country
+        description: Name of the country associated with the user
+        tests:
+          - not_null
+
+      - name: iso_code
+        description: ISO alpha-2 country code associated with the user
+        tests:
+          - not_null
+
+      - name: market
+        description: Name of the market associated with the user
+        tests:
+          - not_null
+
+      - name: user_tenure_days
+        description: Number of days since the user was created
+        tests:
+          - not_null
+
+      - name: user_tenure_days_group
+        description: Bucketed grouping of user tenure in days
+        tests:
+          - not_null
+
+      - name: is_active_user
+        description: Boolean flag indicating whether the user is currently active
+
+      - name: is_validated_user
+        description: Boolean flag indicating whether the user has been validated
+
+      - name: created_at
+        description: Timestamp at which the user was created
+        tests:
+          - not_null
+
+      - name: created_date
+        description: Date at which the user was created
+        tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp at which the user was last updated
+
+      - name: ingestion_timestamp
+        description: Timestamp at which the user record was ingested into the analytics warehouse
+        tests:
+          - not_null
+
+
+  - name: drive_vehicles_dim
+    description: >
+      Dimension table representing vehicles enriched with model, fleet,
+      and operational attributes.
+      One row per vehicle.
+
+    columns:
+      - name: vehicle_id
+        description: Unique identifier of the vehicle
+        tests:
+          - not_null
+          - unique
+
+      - name: model_id
+        description: Unique identifier of the vehicle model
+        tests:
+          - not_null
+
+      - name: fleet_id
+        description: Unique identifier of the fleet the vehicle belongs to
+        tests:
+          - not_null
+
+      - name: city_id
+        description: Unique identifier of the city where the vehicle is located
+        tests:
+          - not_null
+
+      - name: vehicle_status
+        description: "{{ doc('vehicle_status') }}"
+        tests:
+          - not_null
+
+      - name: fuel_level
+        description: Fuel level of the vehicle
+
+      - name: battery_level
+        description: Battery charge level of the vehicle
+
+      - name: model_name
+        description: Model name of the vehicle
+
+      - name: brand
+        description: Manufacturer brand of the vehicle
+
+      - name: energy_type
+        description: Energy type used by the vehicle
+
+      - name: vehicle_segment
+        description: "{{ doc('vehicle_model_segment') }}"
+
+      - name: vehicle_seats
+        description: Number of seats available in the vehicle
+
+      - name: fleet_name
+        description: Name of the fleet the vehicle belongs to
+
+      - name: company_type
+        description: "{{ doc('vehicle_fleet_company_type') }}"
+
+      - name: is_active_vehicle
+        description: Boolean flag indicating whether the vehicle is active
+
+      - name: created_at
+        description: Timestamp at which the vehicle was created
+        tests:
+          - not_null
+
+      - name: created_date
+        description: Date at which the vehicle was created
+        tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp at which the vehicle was last updated
+
+      - name: ingestion_timestamp
+        description: Timestamp at which the vehicle record was ingested into the analytics warehouse
+        tests:
+          - not_null

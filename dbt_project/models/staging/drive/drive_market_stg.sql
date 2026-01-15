@@ -9,10 +9,12 @@ raw AS (
 
 extraction AS (
     SELECT
-        JSON_EXTRACT_SCALAR(data, '$.id') AS market_id,
-        JSON_EXTRACT_SCALAR(data, '$.name') AS market_name,
-        JSON_EXTRACT_SCALAR(data, '$.created_at') AS created_at,
-        JSON_EXTRACT_SCALAR(data, '$.updated_at') AS updated_at,
+        {{ json_extract_fields('data', [
+            {'name': 'market_id', 'path': '$.id'},
+            {'name': 'market_name', 'path': '$.name'},
+            {'name': 'created_at', 'path': '$.created_at'},
+            {'name': 'updated_at', 'path': '$.updated_at'}
+        ]) }},
         timestamp AS ingestion_timestamp
     FROM raw
 ),
@@ -21,8 +23,7 @@ type_casting AS (
     SELECT
         SAFE_CAST(market_id AS STRING) AS market_id,
         SAFE_CAST(market_name AS STRING) AS market_name,
-        DATETIME(TIMESTAMP(SAFE.PARSE_TIMESTAMP('%Y-%m-%dT%H:%M:%E*SZ', created_at)), "Europe/Berlin") AS created_at,
-        DATETIME(TIMESTAMP(SAFE.PARSE_TIMESTAMP('%Y-%m-%dT%H:%M:%E*SZ', updated_at)), "Europe/Berlin") AS updated_at,
+        {{ cast_iso_datetimes(['created_at', 'updated_at']) }},
         DATETIME(TIMESTAMP(ingestion_timestamp), "Europe/Berlin") AS ingestion_timestamp
     FROM extraction
 ),
@@ -30,7 +31,7 @@ type_casting AS (
 standardization AS (
     SELECT
         market_id,
-        LOWER(TRIM(market_name)) AS market_name,
+        {{ standardize_string('market_name') }} AS market_name,
         created_at,
         updated_at,
         ingestion_timestamp

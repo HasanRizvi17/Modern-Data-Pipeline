@@ -1,0 +1,1046 @@
+version: 2
+
+models:
+
+  ### CITY
+  - name: drive_city_stg
+    description: >
+      Staging table containing city records prepared for following data transformations.
+      One row per city with source fields cleaned, type-casted, and standardized to ensure
+      consistency and reliability for downstream intermediate, fact, and dimension models.
+    columns:
+      - name: city_id
+        description: Unique identifier of the city
+        tests:
+          - not_null
+          - unique
+
+      - name: city_name
+        description: Human-readable name of the city
+        tests:
+          - not_null
+
+      - name: country_id
+        description: Unique identifier of the country
+        tests:
+          - not_null
+          - relationships:
+              to: ref('drive_country_stg')
+              field: country_id
+
+      - name: timezone
+        description: Timezone associated with the city
+        tests:
+          - not_null
+
+      - name: created_at
+        description: Timestamp at which the city was created
+        tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp at which the city was last updated
+
+      - name: ingestion_timestamp
+        description: Timestamp at which the city record was ingested into the analytics warehouse
+        tests:
+          - not_null
+
+
+  ### COUNTRY
+  - name: drive_country_stg
+    description: >
+      Staging table containing country records prepared for following data transformations.
+      One row per country with source fields cleaned, type-casted, and standardized to ensure
+      consistency and reliability for downstream intermediate, fact, and dimension models.
+    columns:
+      - name: country_id
+        description: Unique identifier of the country
+        tests:
+          - not_null
+          - unique
+
+      - name: country_name
+        description: Human-readable name of the country
+        tests:
+          - not_null
+
+      - name: iso_code
+        description: ISO alpha-2 code representing the country
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['DE','FR','IT','ES','NL','GB','US','CA']
+
+      - name: currency
+        description: Currency associated with the record
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['EUR','USD','CAD','GBP']
+
+      - name: market_id
+        description: Unique identifier of the market
+        tests:
+          - not_null
+          - relationships:
+              to: ref('drive_market_stg')
+              field: market_id
+
+      - name: created_at
+        description: Timestamp at which the country was created
+        tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp at which the country was last updated
+
+      - name: ingestion_timestamp
+        description: Timestamp at which the country record was ingested into the analytics warehouse
+        tests:
+          - not_null
+
+
+  ### MARKET
+  - name: drive_market_stg
+    description: >
+      Staging table containing market records prepared for following data transformations.
+      One row per market with source fields cleaned, type-casted, and standardized to ensure
+      consistency and reliability for downstream intermediate, fact, and dimension models.
+    columns:
+      - name: market_id
+        description: Unique identifier of the market
+        tests:
+          - not_null
+          - unique
+
+      - name: market_name
+        description: Human-readable name of the market
+        tests:
+          - not_null
+
+      - name: created_at
+        description: Timestamp at which the market was created
+        tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp at which the market was last updated
+
+      - name: ingestion_timestamp
+        description: Timestamp at which the market record was ingested into the analytics warehouse
+        tests:
+          - not_null
+
+
+  ### USER
+  - name: drive_user_stg
+    description: >
+      Staging table containing user records prepared for following data transformations.
+      One row per user with source fields cleaned, type-casted, and standardized to ensure
+      consistency and reliability for downstream intermediate, fact, and dimension models.
+    columns:
+      - name: user_id
+        description: Unique identifier of the user
+        tests:
+          - not_null
+          - unique
+
+      - name: email
+        description: Email address associated with the user account
+        tests:
+          - not_null
+
+      - name: status
+        description: "{{ doc('user_status') }}"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['registered','validated','active','banned','deleted']
+
+      - name: city_id
+        description: Unique identifier of the city
+        tests:
+          - not_null
+          - relationships:
+              to: ref('drive_city_stg')
+              field: city_id
+
+      - name: created_at
+        description: Timestamp at which the user was created
+        tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp at which the user was last updated
+
+      - name: ingestion_timestamp
+        description: Timestamp at which the user record was ingested into the analytics warehouse
+        tests:
+          - not_null
+
+  
+  ### VEHICLE MODEL
+  - name: drive_vehicle_model_stg
+    description: >
+      Staging table containing vehicle model records prepared for following data transformations.
+      One row per vehicle model with source fields cleaned, type-casted, and standardized to ensure
+      consistency and reliability for downstream intermediate, fact, and dimension models.
+    columns:
+      - name: model_id
+        description: Unique identifier of the model
+        tests:
+          - not_null
+          - unique
+
+      - name: brand
+        description: Brand associated with the vehicle model
+        tests:
+          - not_null
+
+      - name: model_name
+        description: Human-readable name of the model
+        tests:
+          - not_null
+
+      - name: energy_type
+        description: Energy source used by the vehicle model
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['electric', 'fuel']
+
+      - name: segment
+        description: "{{ doc('vehicle_model_segment') }}"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['economy', 'comfort', 'premium']
+
+      - name: seats
+        description: Number of seats available in the vehicle model
+        tests:
+          - not_null
+
+      - name: created_at
+        description: Timestamp at which the vehicle model was created
+        tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp at which the vehicle model was last updated
+
+      - name: ingestion_timestamp
+        description: Timestamp at which the vehicle model record was ingested into the analytics warehouse
+        tests:
+          - not_null
+
+
+  ### VEHICLE FLEET
+  - name: drive_vehicle_fleet_stg
+    description: >
+      Staging table containing vehicle fleet records prepared for following data transformations.
+      One row per vehicle fleet with source fields cleaned, type-casted, and standardized to ensure
+      consistency and reliability for downstream intermediate, fact, and dimension models.
+    columns:
+      - name: fleet_id
+        description: Unique identifier of the fleet
+        tests:
+          - not_null
+          - unique
+
+      - name: fleet_name
+        description: Human-readable name of the fleet
+        tests:
+          - not_null
+
+      - name: company_type
+        description: "{{ doc('vehicle_fleet_company_type') }}"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['owned', 'leased', 'partner']
+
+      - name: city_id
+        description: Unique identifier of the city
+        tests:
+          - not_null
+          - relationships:
+              to: ref('drive_city_stg')
+              field: city_id
+
+      - name: created_at
+        description: Timestamp at which the vehicle fleet was created
+        tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp at which the vehicle fleet was last updated
+
+      - name: ingestion_timestamp
+        description: Timestamp at which the vehicle fleet record was ingested into the analytics warehouse
+        tests:
+          - not_null
+
+
+  ### VEHICLE
+  - name: drive_vehicle_stg
+    description: >
+      Staging table containing vehicle records prepared for following data transformations.
+      One row per vehicle with source fields cleaned, type-casted, and standardized to ensure
+      consistency and reliability for downstream intermediate, fact, and dimension models.
+    columns:
+      - name: vehicle_id
+        description: Unique identifier of the vehicle
+        tests:
+          - not_null
+          - unique
+
+      - name: city_id
+        description: Unique identifier of the city
+        tests:
+          - not_null
+          - relationships:
+              to: ref('drive_city_stg')
+              field: city_id
+
+      - name: model_id
+        description: Unique identifier of the model
+        tests:
+          - not_null
+          - relationships:
+              to: ref('drive_vehicle_model_stg')
+              field: model_id
+
+      - name: fleet_id
+        description: Unique identifier of the fleet
+        tests:
+          - not_null
+          - relationships:
+              to: ref('drive_vehicle_fleet_stg')
+              field: fleet_id
+
+      - name: status
+        description: "{{ doc('vehicle_status') }}"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['active', 'maintenance', 'decommissioned']
+
+      - name: battery_level
+        description: Battery level of the vehicle at the time of the record
+
+      - name: fuel_level
+        description: Fuel level of the vehicle at the time of the record
+
+      - name: created_at
+        description: Timestamp at which the vehicle was created
+        tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp at which the vehicle was last updated
+
+      - name: ingestion_timestamp
+        description: Timestamp at which the vehicle record was ingested into the analytics warehouse
+        tests:
+          - not_null
+
+
+  ### TRIP PACKAGE
+  - name: drive_trip_package_stg
+    description: >
+      Staging table containing trip package records prepared for following data transformations.
+      One row per trip package with source fields cleaned, type-casted, and standardized to ensure
+      consistency and reliability for downstream intermediate, fact, and dimension models.
+    columns:
+      - name: package_id
+        description: Unique identifier of the package
+        tests:
+          - not_null
+          - unique
+
+      - name: package_name
+        description: "{{ doc('rental_package') }}"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['per-minute', 'per-hour', 'daily', 'unlimited']
+
+      - name: active_from
+        description: Date from which the trip package was active
+        tests:
+          - not_null
+
+      - name: active_to
+        description: Date until which the trip package was active
+
+      - name: created_at
+        description: Timestamp at which the trip package was created
+        tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp at which the trip package was last updated
+
+      - name: ingestion_timestamp
+        description: Timestamp at which the trip package record was ingested into the analytics warehouse
+        tests:
+          - not_null
+
+
+  ### PROMOTION
+  - name: drive_promotion_stg
+    description: >
+      Staging table containing promotion records prepared for following data transformations.
+      One row per promotion with source fields cleaned, type-casted, and standardized to ensure
+      consistency and reliability for downstream intermediate, fact, and dimension models.
+    columns:
+      - name: promo_id
+        description: Unique identifier of the promo
+        tests:
+          - not_null
+          - unique
+
+      - name: promo_code
+        description: Promotion code used by the customer
+        tests:
+          - not_null
+
+      - name: discount_amount
+        description: Configured discount amount associated with the promotion
+        tests:
+          - not_null
+
+      - name: discount_type
+        description: Type of discount applied by the promotion
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['percentage', 'fixed']
+
+      - name: start_date
+        description: Date on which the promotion started
+        tests:
+          - not_null
+
+      - name: end_date
+        description: Date on which the promotion ended
+
+      - name: created_at
+        description: Timestamp at which the promotion was created
+        tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp at which the promotion was last updated
+
+      - name: ingestion_timestamp
+        description: Timestamp at which the promotion record was ingested into the analytics warehouse
+        tests:
+          - not_null
+
+
+  ### USER PROMOTION
+  - name: drive_user_promotion_stg
+    description: >
+      Staging table containing user promotion records prepared for following data transformations.
+      One row per user promotion with source fields cleaned, type-casted, and standardized to ensure
+      consistency and reliability for downstream intermediate, fact, and dimension models.
+    columns:
+      - name: user_id
+        description: Unique identifier of the user
+        tests:
+          - not_null
+          - relationships:
+              to: ref('drive_user_stg')
+              field: user_id
+
+      - name: promo_id
+        description: Unique identifier of the promo
+        tests:
+          - not_null
+          - relationships:
+              to: ref('drive_promotion_stg')
+              field: promo_id
+
+      - name: redeemed_at
+        description: Timestamp at which the user promotion was redeemed
+
+      - name: created_at
+        description: Timestamp at which the user promotion was created
+        tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp at which the user promotion was last updated
+
+      - name: ingestion_timestamp
+        description: Timestamp at which the user promotion record was ingested into the analytics warehouse
+        tests:
+          - not_null
+
+
+  ### RESERVATION
+  - name: drive_reservation_stg
+    description: >
+      Staging table containing reservation records prepared for following data transformations.
+      One row per reservation with source fields cleaned, type-casted, and standardized to ensure
+      consistency and reliability for downstream intermediate, fact, and dimension models.
+    columns:
+      - name: reservation_id
+        description: Unique identifier of the reservation
+        tests:
+          - not_null
+          - unique
+
+      - name: user_id
+        description: Unique identifier of the user
+        tests:
+          - not_null
+          - relationships:
+              to: ref('drive_user_stg')
+              field: user_id
+
+      - name: vehicle_id
+        description: Unique identifier of the vehicle
+        tests:
+          - not_null
+          - relationships:
+              to: ref('drive_vehicle_stg')
+              field: vehicle_id
+
+      - name: city_id
+        description: Unique identifier of the city
+        tests:
+          - not_null
+          - relationships:
+              to: ref('drive_city_stg')
+              field: city_id
+
+      - name: package_id
+        description: Unique identifier of the package
+        tests:
+          - relationships:
+              to: ref('drive_trip_package_stg')
+              field: package_id
+
+      - name: reserved_at
+        description: Timestamp at which the reservation was reserved
+        tests:
+          - not_null
+
+      - name: reservation_start_at
+        description: Timestamp at which the reservation was scheduled to start
+        tests:
+          - not_null
+
+      - name: reservation_end_at
+        description: Timestamp at which the reservation was scheduled to end
+
+      - name: status
+        description: "{{ doc('reservation_status') }}"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['pending', 'confirmed', 'cancelled', 'expired', 'converted_to_rental']
+
+      - name: cancellation_reason
+        description: Reason provided for cancelling the reservation
+
+      - name: cancelled_at
+        description: Timestamp at which the reservation was cancelled
+
+      - name: rental_id
+        description: Unique identifier of the rental
+        tests:
+          - relationships:
+              to: ref('drive_rental_stg')
+              field: rental_id
+
+      - name: created_at
+        description: Timestamp at which the reservation was created
+        tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp at which the reservation was last updated
+
+      - name: ingestion_timestamp
+        description: Timestamp at which the reservation record was ingested into the analytics warehouse
+        tests:
+          - not_null
+
+
+  ### RENTAL
+  - name: drive_rental_stg
+    description: >
+      Staging table containing rental records prepared for following data transformations.
+      One row per rental with source fields cleaned, type-casted, and standardized to ensure
+      consistency and reliability for downstream intermediate, fact, and dimension models.
+    columns:
+      - name: rental_id
+        description: Unique identifier of the rental
+        tests:
+          - not_null
+          - unique
+
+      - name: user_id
+        description: Unique identifier of the user
+        tests:
+          - not_null
+          - relationships:
+              to: ref('drive_user_stg')
+              field: user_id
+
+      - name: vehicle_id
+        description: Unique identifier of the vehicle
+        tests:
+          - not_null
+          - relationships:
+              to: ref('drive_vehicle_stg')
+              field: vehicle_id
+
+      - name: package_id
+        description: Unique identifier of the package
+        tests:
+          - relationships:
+              to: ref('drive_trip_package_stg')
+              field: package_id
+
+      - name: start_city_id
+        description: Unique identifier of the start city
+        tests:
+          - not_null
+          - relationships:
+              to: ref('drive_city_stg')
+              field: city_id
+
+      - name: end_city_id
+        description: Unique identifier of the end city
+        tests:
+          - not_null
+          - relationships:
+              to: ref('drive_city_stg')
+              field: city_id
+
+      - name: start_time
+        description: Timestamp at which the rental was started
+        tests:
+          - not_null
+
+      - name: end_time
+        description: Timestamp at which the rental was ended
+
+      - name: status
+        description: "{{ doc('rental_status') }}"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['completed', 'cancelled', 'ongoing']
+
+      - name: distance_km
+        description: Total distance traveled during the rental, expressed in kilometers
+
+      - name: final_cost
+        description: Final charged amount for the rental after discounts
+
+      - name: promo_id
+        description: Unique identifier of the promo
+        tests:
+          - relationships:
+              to: ref('drive_promotion_stg')
+              field: promo_id
+
+      - name: reservation_id
+        description: Unique identifier of the reservation
+        tests:
+          - relationships:
+              to: ref('drive_reservation_stg')
+              field: reservation_id
+
+      - name: incident_id
+        description: Unique identifier of the incident
+        tests:
+          - relationships:
+              to: ref('drive_incident_stg')
+              field: incident_id
+
+      - name: created_at
+        description: Timestamp at which the rental was created
+        tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp at which the rental was last updated
+
+      - name: ingestion_timestamp
+        description: Timestamp at which the rental record was ingested into the analytics warehouse
+        tests:
+          - not_null
+
+
+  ### RENTAL RATING
+  - name: drive_rental_rating_stg
+    description: >
+      Staging table containing rental rating records prepared for following data transformations.
+      One row per rental rating with source fields cleaned, type-casted, and standardized to ensure
+      consistency and reliability for downstream intermediate, fact, and dimension models.
+    columns:
+      - name: rating_id
+        description: Unique identifier of the rating
+        tests:
+          - not_null
+          - unique
+
+      - name: rental_id
+        description: Unique identifier of the rental
+        tests:
+          - not_null
+          - relationships:
+              to: ref('drive_rental_stg')
+              field: rental_id
+
+      - name: score
+        description: Numeric rating score provided for the rental
+        tests:
+          - not_null
+
+      - name: comment
+        description: Free-text comment provided with the rating
+
+      - name: created_at
+        description: Timestamp at which the rental rating was created
+        tests:
+          - not_null
+
+      - name: ingestion_timestamp
+        description: Timestamp at which the rental rating record was ingested into the analytics warehouse
+        tests:
+          - not_null
+
+
+  ### PAYMENT
+  - name: drive_payment_stg
+    description: >
+      Staging table containing payment records prepared for following data transformations.
+      One row per payment with source fields cleaned, type-casted, and standardized to ensure
+      consistency and reliability for downstream intermediate, fact, and dimension models.
+    columns:
+      - name: payment_id
+        description: Unique identifier of the payment
+        tests:
+          - not_null
+          - unique
+
+      - name: rental_id
+        description: Unique identifier of the rental
+        tests:
+          - not_null
+          - relationships:
+              to: ref('drive_rental_stg')
+              field: rental_id
+
+      - name: user_id
+        description: Unique identifier of the user
+        tests:
+          - not_null
+          - relationships:
+              to: ref('drive_user_stg')
+              field: user_id
+
+      - name: amount
+        description: Monetary amount associated with the transaction
+        tests:
+          - not_null
+
+      - name: status
+        description: "{{ doc('payment_status') }}"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['succeeded','failed','refunded']
+
+      - name: method
+        description: Payment method used for the transaction
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['card','wallet']
+
+      - name: currency
+        description: Currency associated with the record
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['EUR','USD','CAD','GBP']
+
+      - name: created_at
+        description: Timestamp at which the payment was created
+        tests:
+          - not_null
+
+      - name: ingestion_timestamp
+        description: Timestamp at which the payment record was ingested into the analytics warehouse
+        tests:
+          - not_null
+
+
+  ### REFUND
+  - name: drive_refund_stg
+    description: >
+      Staging table containing refund records prepared for following data transformations.
+      One row per refund with source fields cleaned, type-casted, and standardized to ensure
+      consistency and reliability for downstream intermediate, fact, and dimension models.
+    columns:
+      - name: refund_id
+        description: Unique identifier of the refund
+        tests:
+          - not_null
+          - unique
+
+      - name: payment_id
+        description: Unique identifier of the payment
+        tests:
+          - not_null
+          - relationships:
+              to: ref('drive_payment_stg')
+              field: payment_id
+
+      - name: amount
+        description: Monetary amount associated with the transaction
+        tests:
+          - not_null
+
+      - name: reason
+        description: Reason provided for the refund
+        tests:
+          - not_null
+
+      - name: created_at
+        description: Timestamp at which the refund was created
+        tests:
+          - not_null
+
+      - name: ingestion_timestamp
+        description: Timestamp at which the refund record was ingested into the analytics warehouse
+        tests:
+          - not_null
+
+
+  ### INCIDENT
+  - name: drive_incident_stg
+    description: >
+      Staging table containing incident records prepared for following data transformations.
+      One row per incident with source fields cleaned, type-casted, and standardized to ensure
+      consistency and reliability for downstream intermediate, fact, and dimension models.
+    columns:
+      - name: incident_id
+        description: Unique identifier of the incident
+        tests:
+          - not_null
+          - unique
+
+      - name: rental_id
+        description: Unique identifier of the rental
+        tests:
+          - not_null
+          - relationships:
+              to: ref('drive_rental_stg')
+              field: rental_id
+
+      - name: user_id
+        description: Unique identifier of the user
+        tests:
+          - not_null
+          - relationships:
+              to: ref('drive_user_stg')
+              field: user_id
+
+      - name: vehicle_id
+        description: Unique identifier of the vehicle
+        tests:
+          - not_null
+          - relationships:
+              to: ref('drive_vehicle_stg')
+              field: vehicle_id
+
+      - name: city_id
+        description: Unique identifier of the city
+        tests:
+          - not_null
+          - relationships:
+              to: ref('drive_city_stg')
+              field: city_id
+
+      - name: type
+        description: "{{ doc('incident_type') }}"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['accident','damage','theft','breakdown','other']
+
+      - name: severity
+        description: "{{ doc('incident_severity') }}"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['minor','moderate','severe','critical']
+
+      - name: status
+        description: "{{ doc('incident_status') }}"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['reported','under_review','resolved','closed','insurance_claimed']
+
+      - name: created_at
+        description: Timestamp at which the incident was created
+        tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp at which the incident was last updated
+
+      - name: ingestion_timestamp
+        description: Timestamp at which the incident record was ingested into the analytics warehouse
+        tests:
+          - not_null
+
+
+  ### SUPPORT TICKET
+  - name: drive_support_ticket_stg
+    description: >
+      Staging table containing support ticket records prepared for following data transformations.
+      One row per support ticket with source fields cleaned, type-casted, and standardized to ensure
+      consistency and reliability for downstream intermediate, fact, and dimension models.
+    columns:
+      - name: ticket_id
+        description: Unique identifier of the ticket
+        tests:
+          - not_null
+          - unique
+
+      - name: user_id
+        description: Unique identifier of the user
+        tests:
+          - relationships:
+              to: ref('drive_user_stg')
+              field: user_id
+
+      - name: rental_id
+        description: Unique identifier of the rental
+        tests:
+          - relationships:
+              to: ref('drive_rental_stg')
+              field: rental_id
+
+      - name: incident_id
+        description: Unique identifier of the incident
+        tests:
+          - relationships:
+              to: ref('drive_incident_stg')
+              field: incident_id
+
+      - name: vehicle_id
+        description: Unique identifier of the vehicle
+        tests:
+          - relationships:
+              to: ref('drive_vehicle_stg')
+              field: vehicle_id
+
+      - name: category
+        description: "{{ doc('support_ticket_category') }}"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['billing', 'vehicle_issue', 'account', 'booking', 'incident', 'app_bug', 'other']
+
+      - name: priority
+        description: "{{ doc('support_ticket_priority') }}"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['low','medium','high','critical']
+
+      - name: status
+        description: "{{ doc('support_ticket_status') }}"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['open','in_progress', 'escalated', 'resolved','closed']
+
+      - name: channel
+        description: "{{ doc('support_ticket_channel') }}"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['app','email','phone','chat']
+
+      - name: created_at
+        description: Timestamp at which the support ticket was created
+        tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp at which the support ticket was last updated
+
+      - name: satisfaction_rating
+        description: Customer satisfaction rating provided for the support ticket
+
+      - name: ingestion_timestamp
+        description: Timestamp at which the support ticket record was ingested into the analytics warehouse
+        tests:
+          - not_null
+
+
+  ### TICKET HISTORY
+  - name: drive_ticket_history_stg
+    description: >
+      Staging table containing ticket history records prepared for following data transformations.
+      One row per ticket history with source fields cleaned, type-casted, and standardized to ensure
+      consistency and reliability for downstream intermediate, fact, and dimension models.
+    columns:
+      - name: history_id
+        description: Unique identifier of the history
+        tests:
+          - not_null
+          - unique
+
+      - name: ticket_id
+        description: Unique identifier of the ticket
+        tests:
+          - not_null
+          - relationships:
+              to: ref('drive_support_ticket_stg')
+              field: ticket_id
+
+      - name: changed_at
+        description: Timestamp at which the ticket history was changed
+        tests:
+          - not_null
+
+      - name: changed_by
+        description: "{{ doc('ticket_history_changed_by') }}"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['user','agent','system']
+
+      - name: field_changed
+        description: Name of the field that was changed
+        tests:
+          - not_null
+
+      - name: old_value
+        description: Previous value of the changed field
+
+      - name: new_value
+        description: New value of the changed field
+        tests:
+          - not_null
+
+      - name: ingestion_timestamp
+        description: Timestamp at which the ticket history record was ingested into the analytics warehouse
+        tests:
+          - not_null

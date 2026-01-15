@@ -15,8 +15,6 @@ vehicle_fleets AS (
     FROM {{ ref('drive_vehicle_fleet_stg') }}
 ),
 
-
-
 vehicles_data AS (
     SELECT
         v.vehicle_id,

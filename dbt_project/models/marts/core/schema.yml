@@ -1,0 +1,599 @@
+version: 2
+
+models:
+  - name: core_rentals_self_serve_mart
+    description: >
+      Core self-serve rentals mart providing a direct, business-facing view of
+      rental-level data. This mart exposes the full rental fact without additional
+      aggregation to support ad-hoc analysis, debugging, operational deep dives,
+      and flexible BI exploration across product, operations, finance, and support
+      teams.
+
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - rental_id
+
+      - dbt_utils.expression_is_true:
+          expression: "start_time <= end_time OR end_time IS NULL"
+
+      - dbt_utils.expression_is_true:
+          expression: "rental_duration_min IS NULL OR rental_duration_min >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "gross_revenue >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "net_revenue <= gross_revenue"
+
+      - dbt_utils.expression_is_true:
+          expression: "created_date <= CURRENT_DATE()"
+
+    columns:
+      - name: rental_id
+        description: Unique identifier for a rental.
+        tests:
+          - not_null
+          - unique
+
+      - name: user_id
+        description: Identifier of the user who performed the rental.
+        tests:
+          - not_null
+
+      - name: vehicle_id
+        description: Identifier of the vehicle rented.
+        tests:
+          - not_null
+
+      - name: model_id
+        description: Vehicle model identifier.
+
+      - name: fleet_id
+        description: Fleet identifier to which the vehicle belongs.
+
+      - name: package_id
+        description: Identifier of the rental package selected.
+
+      - name: start_city_id
+        description: City identifier where the rental started.
+
+      - name: end_city_id
+        description: City identifier where the rental ended.
+
+      - name: vehicle_city_id
+        description: City identifier where the vehicle is assigned.
+
+      - name: reservation_id
+        description: Identifier of the reservation linked to the rental, if any.
+
+      - name: incident_id
+        description: Identifier of the primary incident linked to the rental, if any.
+
+      - name: promo_id
+        description: Identifier of the promotion applied to the rental, if any.
+
+      - name: user_city_id
+        description: City identifier associated with the user at rental time.
+
+      - name: user_country_id
+        description: Country identifier associated with the user at rental time.
+
+      - name: user_market_id
+        description: Market identifier associated with the user at rental time.
+
+      - name: user_status
+        description: Status of the user at the time of rental.
+
+      - name: user_city
+        description: City name associated with the user.
+
+      - name: user_country
+        description: Country name associated with the user.
+
+      - name: user_market
+        description: Market name associated with the user.
+
+      - name: user_tenure_days
+        description: Number of days since user signup at rental time.
+
+      - name: user_tenure_days_group
+        description: Bucketed user tenure group.
+
+      - name: is_active_user
+        description: Indicates whether the user is considered active.
+
+      - name: is_validated_user
+        description: Indicates whether the user has completed validation.
+
+      - name: start_time
+        description: Timestamp when the rental started.
+
+      - name: end_time
+        description: Timestamp when the rental ended.
+
+      - name: start_date
+        description: Date when the rental started.
+
+      - name: end_date
+        description: Date when the rental ended.
+
+      - name: reserved_at
+        description: Timestamp when the rental was reserved.
+
+      - name: reservation_start_at
+        description: Scheduled start time of the reservation.
+
+      - name: reservation_end_at
+        description: Scheduled end time of the reservation.
+
+      - name: start_city
+        description: Name of the city where the rental started.
+
+      - name: end_city
+        description: Name of the city where the rental ended.
+
+      - name: vehicle_city
+        description: Name of the city where the vehicle is assigned.
+
+      - name: is_inter_city_travel
+        description: Indicates whether the rental involved travel between cities.
+
+      - name: rental_status
+        description: "{{ doc('rental_status') }}"
+
+      - name: package_name
+        description: "{{ doc('rental_package') }}"
+
+      - name: model_name
+        description: Vehicle model name.
+
+      - name: brand
+        description: Vehicle brand.
+
+      - name: energy_type
+        description: Energy type of the vehicle (e.g. electric, fuel).
+
+      - name: vehicle_segment
+        description: "{{ doc('vehicle_model_segment') }}"
+
+      - name: vehicle_seats
+        description: Number of seats in the vehicle.
+
+      - name: fleet_name
+        description: Name of the fleet the vehicle belongs to.
+
+      - name: company_type
+        description: "{{ doc('vehicle_fleet_company_type') }}"
+
+      - name: rental_duration_min
+        description: Total rental duration in minutes.
+
+      - name: rental_duration_hour
+        description: Total rental duration in hours.
+
+      - name: distance_km
+        description: Distance driven during the rental in kilometers.
+
+      - name: rental_cost
+        description: Base cost of the rental before payments and adjustments.
+
+      - name: paid_amount
+        description: Total successfully paid amount for the rental.
+
+      - name: refunded_amount
+        description: Total refunded amount for the rental.
+
+      - name: failed_amount
+        description: Total failed payment amount for the rental.
+
+      - name: wallet_paid_amount
+        description: Portion of payment made via wallet.
+
+      - name: card_paid_amount
+        description: Portion of payment made via card.
+
+      - name: discount_amount
+        description: Discount amount applied to the rental.
+
+      - name: gross_revenue
+        description: Gross revenue generated by the rental.
+
+      - name: net_revenue
+        description: Net revenue after refunds and discounts.
+
+      - name: has_refund
+        description: Indicates whether the rental has any refund.
+
+      - name: used_promotion
+        description: Indicates whether a promotion was used.
+
+      - name: avg_rating_value
+        description: Average rating value received for the rental.
+
+      - name: rating_count
+        description: Number of ratings received for the rental.
+
+      - name: first_rating_delay_hours
+        description: Time in hours between rental end and first rating.
+
+      - name: is_5_star_rating
+        description: Indicates whether the rental received a 5-star rating.
+
+      - name: is_1_star_rating
+        description: Indicates whether the rental received a 1-star rating.
+
+      - name: ticket_support_rating
+        description: Support rating associated with tickets for the rental.
+
+      - name: ticket_count
+        description: Number of support tickets associated with the rental.
+
+      - name: has_support_ticket
+        description: Indicates whether the rental has any support ticket.
+
+      - name: ticket_has_escalation
+        description: Indicates whether any support ticket was escalated.
+
+      - name: ticket_first_response_at
+        description: Timestamp of the first support response.
+
+      - name: ticket_first_escalated_at
+        description: Timestamp of the first ticket escalation.
+
+      - name: ticket_resolved_at
+        description: Timestamp when the ticket was resolved.
+
+      - name: incident_count
+        description: Number of incidents associated with the rental.
+
+      - name: critical_incident_count
+        description: Number of critical incidents associated with the rental.
+
+      - name: incidents_with_police_report_filed
+        description: Number of incidents with police reports filed.
+
+      - name: incident_estimated_cost
+        description: Estimated total cost of incidents for the rental.
+
+      - name: has_incident
+        description: Indicates whether the rental has any incident.
+
+      - name: created_at
+        description: Timestamp when the rental record was created.
+
+      - name: created_date
+        description: Date when the rental record was created.
+
+      - name: updated_at
+        description: Timestamp when the rental record was last updated.
+
+      - name: ingestion_timestamp
+        description: Timestamp when the record was ingested into the warehouse.
+
+
+  - name: core_daily_kpis_mart
+    description: >
+      Core daily KPI mart providing a single, business-facing view of platform
+      performance at day grain. Combines rentals, revenue, usage, customer
+      experience, support, and incident metrics to serve as the primary source
+      for executive dashboards and high-level product, operations, and finance
+      reporting.
+
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - date
+
+      - dbt_utils.expression_is_true:
+          expression: "date <= CURRENT_DATE()"
+
+      - dbt_utils.expression_is_true:
+          expression: "total_rentals >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "active_users >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "gross_revenue >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "net_revenue <= gross_revenue"
+
+      - dbt_utils.expression_is_true:
+          expression: "avg_rentals_per_user >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "avg_revenue_per_user >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "avg_revenue_per_rental >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "rentals_with_refund <= total_rentals"
+
+      - dbt_utils.expression_is_true:
+          expression: "rentals_with_ticket <= total_rentals"
+
+      - dbt_utils.expression_is_true:
+          expression: "rentals_with_incident <= total_rentals"
+
+    columns:
+      # -----------------------
+      # Grain
+      # -----------------------
+      - name: date
+        description: Calendar date for which KPIs are calculated.
+        tests:
+          - not_null
+
+      # -----------------------
+      # Rental activity
+      # -----------------------
+      - name: active_users
+        description: Number of distinct users who completed at least one rental on the date.
+
+      - name: total_rentals
+        description: Total number of rentals completed on the date.
+
+      - name: avg_rentals_per_user
+        description: Average number of rentals per active user on the date.
+
+      - name: avg_revenue_per_user
+        description: Average net revenue generated per active user on the date.
+
+      - name: avg_revenue_per_rental
+        description: Average net revenue generated per rental on the date.
+
+      # -----------------------
+      # Financials
+      # -----------------------
+      - name: gross_revenue
+        description: Total gross revenue generated on the date.
+
+      - name: net_revenue
+        description: Total net revenue generated on the date.
+
+      - name: discount_amount
+        description: Total discount amount applied on the date.
+
+      - name: refunded_amount
+        description: Total refunded amount on the date.
+
+      - name: rentals_with_refund
+        description: Number of rentals that had at least one refund on the date.
+
+      # -----------------------
+      # Vehicle usage
+      # -----------------------
+      - name: total_rental_duration_min
+        description: Total rental duration in minutes across all rentals on the date.
+
+      - name: total_rental_duration_hour
+        description: Total rental duration in hours across all rentals on the date.
+
+      - name: total_distance_km
+        description: Total distance traveled across all rentals on the date.
+
+      # -----------------------
+      # User experience
+      # -----------------------
+      - name: avg_rating_value
+        description: Average rating value across all rentals on the date.
+
+      - name: five_star_rentals
+        description: Number of rentals that received a 5-star rating on the date.
+
+      - name: one_star_rentals
+        description: Number of rentals that received a 1-star rating on the date.
+
+      # -----------------------
+      # Support
+      # -----------------------
+      - name: ticket_count
+        description: Total number of support tickets associated with rentals on the date.
+
+      - name: rentals_with_ticket
+        description: Number of rentals that had at least one support ticket on the date.
+
+      - name: rentals_with_ticket_escalation
+        description: Number of rentals that had at least one escalated support ticket on the date.
+
+      # -----------------------
+      # Incidents
+      # -----------------------
+      - name: incident_count
+        description: Total number of incidents associated with rentals on the date.
+
+      - name: critical_incident_count
+        description: Total number of critical incidents associated with rentals on the date.
+
+      - name: rentals_with_incident
+        description: Number of rentals that had at least one incident on the date.
+
+
+  - name: core_users_360_mart
+    description: >
+      Core user 360 mart providing a consolidated, lifetime view of user activity,
+      engagement, monetization, support, and incident history in the car-sharing
+      business. Aggregated at user grain, this mart supports segmentation,
+      retention analysis, lifecycle modeling, and customer value analysis.
+
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - user_id
+
+      - dbt_utils.expression_is_true:
+          expression: "active_days >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "active_weeks >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "active_months >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "active_quarters >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "active_years >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "activity_rate_days BETWEEN 0 AND 1"
+
+      - dbt_utils.expression_is_true:
+          expression: "activity_rate_weeks BETWEEN 0 AND 1"
+
+      - dbt_utils.expression_is_true:
+          expression: "activity_rate_months BETWEEN 0 AND 1"
+
+      - dbt_utils.expression_is_true:
+          expression: "recency_days >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "total_rentals >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "lifetime_gross_revenue >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "lifetime_net_revenue <= lifetime_gross_revenue"
+
+    columns:
+      # -----------------------
+      # Grain
+      # -----------------------
+      - name: user_id
+        description: Unique identifier of the user.
+        tests:
+          - not_null
+
+      - name: user_city
+        description: City associated with the user.
+
+      - name: user_country
+        description: Country associated with the user.
+
+      - name: user_market
+        description: Market associated with the user.
+
+      - name: user_tenure_days
+        description: Number of days since user signup.
+
+      - name: user_tenure_days_group
+        description: Bucketed user tenure group.
+
+      # -----------------------
+      # Activity
+      # -----------------------
+      - name: active_days
+        description: Number of distinct days on which the user was active.
+
+      - name: active_weeks
+        description: Number of distinct weeks on which the user was active.
+
+      - name: active_months
+        description: Number of distinct months on which the user was active.
+
+      - name: active_quarters
+        description: Number of distinct quarters on which the user was active.
+
+      - name: active_years
+        description: Number of distinct years on which the user was active.
+
+      - name: activity_rate_days
+        description: Ratio of active days to total days between first and last rental.
+
+      - name: activity_rate_weeks
+        description: Ratio of active weeks to total weeks between first and last rental.
+
+      - name: activity_rate_months
+        description: Ratio of active months to total months between first and last rental.
+
+      - name: first_rental_date
+        description: Date of the user’s first recorded rental.
+
+      - name: last_rental_date
+        description: Date of the user’s most recent recorded rental.
+
+      - name: recency_days
+        description: Number of days since the user’s last rental.
+
+      # -----------------------
+      # Rental & revenue
+      # -----------------------
+      - name: total_rentals
+        description: Total number of rentals completed by the user.
+
+      - name: avg_revenue_per_rental
+        description: Average net revenue generated per rental.
+
+      - name: lifetime_gross_revenue
+        description: Total gross revenue generated by the user across all rentals.
+
+      - name: lifetime_net_revenue
+        description: Total net revenue generated by the user across all rentals.
+
+      - name: lifetime_discount_amount
+        description: Total discount amount applied across all rentals.
+
+      - name: lifetime_refunded_amount
+        description: Total refunded amount across all rentals.
+
+      - name: rentals_with_refund
+        description: Number of rentals that had at least one refund.
+
+      # -----------------------
+      # Usage
+      # -----------------------
+      - name: total_rental_duration_min
+        description: Total rental duration in minutes across all rentals.
+
+      - name: total_rental_duration_hour
+        description: Total rental duration in hours across all rentals.
+
+      - name: total_distance_km
+        description: Total distance traveled across all rentals.
+
+      - name: avg_rental_duration_hour
+        description: Average rental duration in hours.
+
+      # -----------------------
+      # Experience
+      # -----------------------
+      - name: rating_count
+        description: Total number of ratings received across all rentals.
+
+      - name: avg_rating_value
+        description: Weighted average rating value across all rentals.
+
+      - name: five_star_rentals
+        description: Number of rentals that received a 5-star rating.
+
+      - name: one_star_rentals
+        description: Number of rentals that received a 1-star rating.
+
+      # -----------------------
+      # Support
+      # -----------------------
+      - name: ticket_count
+        description: Total number of support tickets associated with the user.
+
+      - name: rentals_with_ticket
+        description: Number of rentals that had at least one support ticket.
+
+      - name: rentals_with_ticket_escalation
+        description: Number of rentals that had at least one escalated support ticket.
+
+      # -----------------------
+      # Incidents
+      # -----------------------
+      - name: incident_count
+        description: Total number of incidents associated with the user’s rentals.
+
+      - name: critical_incident_count
+        description: Total number of critical incidents associated with the user’s rentals.
+
+      - name: rentals_with_incident
+        description: Number of rentals that had at least one incident.

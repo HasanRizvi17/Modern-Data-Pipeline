@@ -1,0 +1,75 @@
+version: 2
+
+macros:
+
+  - name: generate_schema_name
+    description: Overrides dbt's default schema naming logic to control how schemas are created per target/environment.
+    arguments:
+      - name: custom_schema_name
+        type: string
+        description: Optional schema name configured on a model/source
+      - name: node
+        type: string
+        description: dbt node metadata for the resource being built
+
+  - name: apply_discount
+    description: >
+      Computes the discount amount to apply based on discount type. For fixed discounts it returns the discount amount,
+      for percentage discounts it multiplies the discount amount by the gross value of the rental cost.
+    arguments:
+      - name: discount_type
+        type: string
+        description: Type of discount (fixed or percentage)
+      - name: discount_amount
+        type: numeric
+        description: Configured discount value
+      - name: gross_value
+        type: numeric
+        description: Base rental cost the discount is applied to 
+
+  - name: convert_to_euro
+    description: >
+      Converts a given amount from a other currencies to Euro using provided exchange rates
+    arguments:
+      - name: amount
+        type: numeric
+        description: Amount in original currency
+      - name: rate
+        type: numeric
+        description: Exchange rate to convert the amount to Euro
+
+  - name: standardize_string
+    description: >
+      Standardizes a string by trimming whitespace, converting to lowercase and replacing blank/emptys strings with NULL.
+    arguments:
+      - name: col
+        type: string
+        description: The string to be standardized
+      - name: lower
+        type: string
+        description: Whether to convert the string to lowercase (default = 'yes')
+      - name: nullif_empty
+        type: string
+        description: Whether to replace empty strings with NULL (default = 'yes')
+
+  - name: cast_iso_datetimes
+    description: >
+      Casts a list of string fields representing ISO 8601 datetime values to proper DATETIME type in BigQuery.
+    arguments:
+      - name: field_names
+        type: list
+        description: List of field names to cast to DATETIME
+      - name: timezone
+        type: string
+        description: Timezone to use for the DATETIME conversion (default = "Europe/Berlin")
+
+  - name: json_extract_fields
+    description: >
+      Extracts multiple fields from a JSON string using JSON_EXTRACT_SCALAR and aliases them appropriately.
+    arguments:
+      - name: json_column
+        type: string
+        description: The name of the JSON string field to extract from
+      - name: fields
+        type: list
+        description: List of field names to extract from the JSON column

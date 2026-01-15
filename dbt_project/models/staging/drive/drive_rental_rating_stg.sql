@@ -9,11 +9,13 @@ raw AS (
 
 extraction AS (
     SELECT
-        JSON_EXTRACT_SCALAR(data, '$.id') AS rating_id,
-        JSON_EXTRACT_SCALAR(data, '$.rental_id') AS rental_id,
-        JSON_EXTRACT_SCALAR(data, '$.score') AS score,
-        JSON_EXTRACT_SCALAR(data, '$.comment') AS comment,
-        JSON_EXTRACT_SCALAR(data, '$.created_at') AS created_at,
+        {{ json_extract_fields('data', [
+            {'name': 'rating_id', 'path': '$.id'},
+            {'name': 'rental_id', 'path': '$.rental_id'},
+            {'name': 'score', 'path': '$.score'},
+            {'name': 'comment', 'path': '$.comment'},
+            {'name': 'created_at', 'path': '$.created_at'}
+        ]) }},
         timestamp AS ingestion_timestamp
     FROM raw
 ),
@@ -24,7 +26,7 @@ type_casting AS (
         SAFE_CAST(rental_id AS STRING) AS rental_id,
         SAFE_CAST(score AS INT64) AS score,
         SAFE_CAST(comment AS STRING) AS comment,
-        DATETIME(TIMESTAMP(SAFE.PARSE_TIMESTAMP('%Y-%m-%dT%H:%M:%E*SZ', created_at)), "Europe/Berlin") AS created_at,
+        {{ cast_iso_datetimes(['created_at']) }},
         DATETIME(TIMESTAMP(ingestion_timestamp), "Europe/Berlin") AS ingestion_timestamp
     FROM extraction
 ),
@@ -34,7 +36,7 @@ standardization AS (
         rating_id,
         rental_id,
         COALESCE(score, 0) AS score,
-        NULLIF(TRIM(comment), '') AS comment,
+        {{ standardize_string('comment') }} AS comment,
         created_at,
         ingestion_timestamp
     FROM type_casting

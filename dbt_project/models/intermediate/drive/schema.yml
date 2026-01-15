@@ -1,0 +1,457 @@
+version: 2
+
+models:
+
+  - name: drive_users_int
+    description: >
+      Intermediate model enriching user records with geographic, market,
+      and tenure-related attributes derived from staging tables.
+      One row per user.
+
+    columns:
+      - name: user_id
+        description: Unique identifier of the user
+        tests:
+          - not_null
+          - unique
+
+      - name: city_id
+        description: Unique identifier of the city
+
+      - name: country_id
+        description: Unique identifier of the country
+
+      - name: market_id
+        description: Unique identifier of the market
+
+      - name: user_email
+        description: Email address associated with the user account
+
+      - name: user_status
+        description: "{{ doc('user_status') }}"
+        tests:
+          - not_null
+
+      - name: city
+        description: Name of the city associated with the user
+
+      - name: country
+        description: Name of the country associated with the user
+
+      - name: iso_code
+        description: ISO alpha-2 country code associated with the user
+
+      - name: market
+        description: Name of the market associated with the user
+
+      - name: user_tenure_days
+        description: Number of days since the user was created
+        tests:
+          - not_null
+
+      - name: user_tenure_days_group
+        description: Bucketed grouping of user tenure in days
+        tests:
+          - not_null
+
+      - name: is_active_user
+        description: Boolean flag indicating whether the user is currently active
+
+      - name: is_validated_user
+        description: Boolean flag indicating whether the user has been validated
+
+      - name: created_at
+        description: Timestamp at which the user was created
+        tests:
+          - not_null
+
+      - name: created_date
+        description: Date at which the user was created
+        tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp at which the user was last updated
+
+      - name: ingestion_timestamp
+        description: Timestamp at which the user record was ingested into the analytics warehouse
+        tests:
+          - not_null
+
+
+  - name: drive_vehicles_int
+    description: >
+      Intermediate model enriching vehicle records with fleet, model,
+      and geographic context.
+      One row per vehicle.
+
+    columns:
+      - name: vehicle_id
+        description: Unique identifier of the vehicle
+        tests:
+          - not_null
+          - unique
+
+      - name: city_id
+        description: Unique identifier of the city
+        tests:
+          - not_null
+
+      - name: model_id
+        description: Unique identifier of the vehicle model
+        tests:
+          - not_null
+
+      - name: fleet_id
+        description: Unique identifier of the vehicle fleet
+        tests:
+          - not_null
+
+      - name: vehicle_status
+        description: "{{ doc('vehicle_status') }}"
+        tests:
+          - not_null
+
+      - name: battery_level
+        description: Battery charge level of the vehicle
+
+      - name: fuel_level
+        description: Fuel level of the vehicle
+
+      - name: brand
+        description: Manufacturer brand of the vehicle model
+
+      - name: model_name
+        description: Model name of the vehicle
+
+      - name: energy_type
+        description: Energy type used by the vehicle
+
+      - name: segment
+        description: "{{ doc('vehicle_model_segment') }}"
+
+      - name: seats
+        description: Number of seats available in the vehicle
+
+      - name: fleet_name
+        description: Name of the vehicle fleet
+
+      - name: company_type
+        description: "{{ doc('vehicle_fleet_company_type') }}"
+
+      - name: city
+        description: Name of the city where the vehicle is located
+
+      - name: country
+        description: Name of the country where the vehicle is located
+
+      - name: iso_code
+        description: ISO alpha-2 country code associated with the vehicle
+
+      - name: market
+        description: Name of the market where the vehicle operates
+
+      - name: created_at
+        description: Timestamp at which the vehicle was created
+        tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp at which the vehicle was last updated
+
+      - name: ingestion_timestamp
+        description: Timestamp at which the vehicle record was ingested into the analytics warehouse
+        tests:
+          - not_null
+
+
+  - name: drive_rentals_base_int
+    description: >
+      Intermediate model serving as the core rental spine, enriching rental
+      records with user, vehicle, geography, and pricing context.
+      One row per rental.
+
+    columns:
+      - name: rental_id
+        description: Unique identifier of the rental
+        tests:
+          - not_null
+          - unique
+
+      - name: user_id
+        description: Unique identifier of the user
+        tests:
+          - not_null
+
+      - name: vehicle_id
+        description: Unique identifier of the vehicle
+        tests:
+          - not_null
+
+      - name: package_id
+        description: Unique identifier of the rental package
+
+      - name: promo_id
+        description: Unique identifier of the promotion applied to the rental
+
+      - name: reservation_id
+        description: Unique identifier of the reservation
+
+      - name: incident_id
+        description: Unique identifier of the incident associated with the rental
+
+      - name: start_city_id
+        description: Unique identifier of the rental start city
+        tests:
+          - not_null
+
+      - name: end_city_id
+        description: Unique identifier of the rental end city
+        tests:
+          - not_null
+
+      - name: start_city
+        description: Name of the rental start city
+
+      - name: end_city
+        description: Name of the rental end city
+
+      - name: rental_status
+        description: "{{ doc('rental_status') }}"
+        tests:
+          - not_null
+
+      - name: start_time
+        description: Timestamp at which the rental was started
+        tests:
+          - not_null
+
+      - name: end_time
+        description: Timestamp at which the rental was ended
+
+      - name: rental_duration_min
+        description: Total duration of the rental expressed in minutes
+        tests:
+          - not_null
+
+      - name: rental_duration_hour
+        description: Total duration of the rental expressed in hours
+        tests:
+          - not_null
+
+      - name: rental_cost
+        description: Base cost of the rental before discounts
+        tests:
+          - not_null
+
+      - name: discount_amount
+        description: Discount amount applied to the rental
+
+      - name: final_cost
+        description: Final charged amount for the rental after discounts
+        tests:
+          - not_null
+
+      - name: created_at
+        description: Timestamp at which the rental was created
+        tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp at which the rental was last updated
+
+      - name: ingestion_timestamp
+        description: Timestamp at which the rental record was ingested into the analytics warehouse
+        tests:
+          - not_null
+
+
+  - name: drive_rental_payments_int
+    description: >
+      Intermediate model collapsing payments records on rental-level,
+      including refund-related attributes.
+      One row per rental.
+
+    columns:
+      - name: payment_id
+        description: Unique identifier of the payment
+        tests:
+          - not_null
+          - unique
+
+      - name: rental_id
+        description: Unique identifier of the rental
+        tests:
+          - not_null
+
+      - name: user_id
+        description: Unique identifier of the user
+        tests:
+          - not_null
+
+      - name: amount
+        description: Monetary amount charged in the payment
+        tests:
+          - not_null
+
+      - name: currency
+        description: Currency in which the payment was processed
+        tests:
+          - not_null
+
+      - name: method
+        description: Payment method used for the transaction
+        tests:
+          - not_null
+
+      - name: status
+        description: Processing status of the payment
+        tests:
+          - not_null
+
+      - name: refund_amount
+        description: Total amount refunded for the payment
+
+      - name: refund_reason
+        description: Reason for the refund
+
+      - name: has_refund
+        description: Boolean flag indicating whether the payment has a refund
+
+      - name: created_at
+        description: Timestamp at which the payment was created
+        tests:
+          - not_null
+
+      - name: ingestion_timestamp
+        description: Timestamp at which the payment record was ingested into the analytics warehouse
+        tests:
+          - not_null
+
+
+  - name: drive_rental_ratings_int
+    description: >
+      Intermediate model collapsing rental rating records on rental-level.
+      One row per rental.
+
+    columns:
+      - name: rating_id
+        description: Unique identifier of the rental rating
+        tests:
+          - not_null
+          - unique
+
+      - name: rental_id
+        description: Unique identifier of the rental
+        tests:
+          - not_null
+
+      - name: user_id
+        description: Unique identifier of the user
+
+      - name: score
+        description: Rating score provided by the user
+        tests:
+          - not_null
+
+      - name: comment
+        description: Optional free-text comment provided by the user
+
+      - name: vehicle_id
+        description: Unique identifier of the vehicle
+
+      - name: city
+        description: Name of the city where the rental occurred
+
+      - name: country
+        description: Name of the country where the rental occurred
+
+      - name: market
+        description: Name of the market where the rental occurred
+
+      - name: created_at
+        description: Timestamp at which the rating was created
+        tests:
+          - not_null
+
+      - name: ingestion_timestamp
+        description: Timestamp at which the rating record was ingested into the analytics warehouse
+        tests:
+          - not_null
+
+
+  - name: drive_rental_issues_int
+    description: >
+      Intermediate model combining rental incidents with associated support
+      ticket information for operational and customer support analysis.
+      One row per rental.
+
+    columns:
+      - name: incident_id
+        description: Unique identifier of the incident
+        tests:
+          - not_null
+          - unique
+
+      - name: rental_id
+        description: Unique identifier of the rental
+        tests:
+          - not_null
+
+      - name: user_id
+        description: Unique identifier of the user
+        tests:
+          - not_null
+
+      - name: vehicle_id
+        description: Unique identifier of the vehicle
+        tests:
+          - not_null
+
+      - name: city_id
+        description: Unique identifier of the city
+        tests:
+          - not_null
+
+      - name: type
+        description: Category of the incident
+        tests:
+          - not_null
+
+      - name: severity
+        description: Severity level of the incident
+        tests:
+          - not_null
+
+      - name: status
+        description: Current processing status of the incident
+        tests:
+          - not_null
+
+      - name: ticket_id
+        description: Unique identifier of the support ticket
+
+      - name: ticket_category
+        description: Category of the support ticket
+
+      - name: ticket_priority
+        description: Priority level of the support ticket
+
+      - name: ticket_status
+        description: Current status of the support ticket
+
+      - name: ticket_channel
+        description: Channel through which the support ticket was created
+
+      - name: created_at
+        description: Timestamp at which the incident was created
+        tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp at which the incident was last updated
+
+      - name: ingestion_timestamp
+        description: Timestamp at which the incident record was ingested into the analytics warehouse
+        tests:
+          - not_null
