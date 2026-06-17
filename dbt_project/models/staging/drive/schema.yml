@@ -642,7 +642,7 @@ models:
       - name: distance_km
         description: Total distance traveled during the rental, expressed in kilometers
 
-      - name: final_cost
+      - name: rental_cost
         description: Final charged amount for the rental after discounts
 
       - name: promo_id

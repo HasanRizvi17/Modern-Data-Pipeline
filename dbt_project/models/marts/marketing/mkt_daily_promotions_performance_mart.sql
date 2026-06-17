@@ -14,9 +14,10 @@ rentals AS (
         is_inter_city_travel,
         package_name,
         promo_id,
-        rental_cost
+        rental_cost_eur AS rental_cost
     FROM {{ ref('drive_rentals_fct') }}
     WHERE promo_id IS NOT NULL
+      AND rental_status != 'cancelled'
 ),
 
 rental_promotions AS (

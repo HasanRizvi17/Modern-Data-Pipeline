@@ -11,6 +11,7 @@ dbt_project/logs/          # dbt output (compiled models)
 dbt_project/dbt_packages
 dbt_project/.user.yml
 dbt_project/package-lock.yml
+dbt_project/dist
 
 # Airflow
 airflow_dags/__pycache__/  # Cached Python files in DAGs

@@ -1,14 +1,10 @@
-WITH 
+WITH
 
 rentals AS (
 
     SELECT *
     FROM {{ ref('drive_rentals_fct') }}
-),
-
-cities AS (
-    SELECT *
-    FROM {{ ref('drive_cities_dim') }}
+    WHERE rental_status != 'cancelled'
 )
 
 SELECT
@@ -33,8 +29,8 @@ SELECT
     SUM(rental_duration_hour) AS total_rental_duration_hour,
     SUM(distance_km) AS total_distance_km,
     -- revenue metrics
-    SUM(gross_revenue) AS gross_revenue,
-    SUM(net_revenue) AS net_revenue,
+    SUM(gross_revenue_eur) AS gross_revenue,
+    SUM(net_revenue_eur) AS net_revenue,
     -- incidents and support
     SUM(incident_count) AS incident_count,
     SUM(critical_incident_count) AS critical_incident_count,

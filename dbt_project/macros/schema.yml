@@ -15,7 +15,8 @@ macros:
   - name: apply_discount
     description: >
       Computes the discount amount to apply based on discount type. For fixed discounts it returns the discount amount,
-      for percentage discounts it multiplies the discount amount by the gross value of the rental cost.
+      for percentage discounts it treats discount_amount as a whole percent (e.g. 10 = 10%) and applies it to the
+      gross value of the rental cost.
     arguments:
       - name: discount_type
         type: string

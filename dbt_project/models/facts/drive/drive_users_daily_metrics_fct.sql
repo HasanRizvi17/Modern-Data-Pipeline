@@ -3,6 +3,7 @@ WITH
 rentals AS (
     SELECT *
     FROM {{ ref('drive_rentals_fct') }}
+    WHERE rental_status != 'cancelled'
 )
 
 SELECT

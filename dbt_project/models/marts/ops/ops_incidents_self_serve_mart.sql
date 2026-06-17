@@ -15,7 +15,7 @@ incidents AS (
 incidents_360 AS (
     SELECT
         -- incidents data
-        i.* EXCEPT(created_at, created_date, updated_at, ingestion_timestamp),
+        i.* EXCEPT(created_at, created_date, updated_at),
         -- related rentals data
         -- IDs (for clustering tables)
         r.model_id,
@@ -46,15 +46,15 @@ incidents_360 AS (
         r.rental_duration_hour,
         r.distance_km,
         -- payments / financials
-        r.rental_cost,
-        r.paid_amount,
-        r.refunded_amount,
-        r.failed_amount,
-        r.wallet_paid_amount,
-        r.card_paid_amount,
-        r.discount_amount,
-        r.gross_revenue,
-        r.net_revenue,
+        r.rental_cost_eur AS rental_cost,
+        r.paid_amount_eur AS paid_amount,
+        r.refunded_amount_eur AS refunded_amount,
+        r.failed_amount_eur AS failed_amount,
+        r.wallet_paid_amount_eur AS wallet_paid_amount,
+        r.card_paid_amount_eur AS card_paid_amount,
+        r.discount_amount_eur AS discount_amount,
+        r.gross_revenue_eur AS gross_revenue,
+        r.net_revenue_eur AS net_revenue,
         r.has_refund,
         r.used_promotion,
         -- ratings

@@ -15,12 +15,18 @@ vehicle_fleets AS (
     FROM {{ ref('drive_vehicle_fleet_stg') }}
 ),
 
+cities AS (
+    SELECT *
+    FROM {{ ref('drive_city_stg') }}
+),
+
 vehicles_data AS (
     SELECT
         v.vehicle_id,
         v.model_id,
         v.fleet_id,
         v.city_id,
+        c.city_name,
         v.status AS vehicle_status,
         v.fuel_level,
         v.battery_level,
@@ -42,6 +48,7 @@ vehicles_data AS (
     FROM vehicles AS v
     LEFT JOIN vehicle_models AS vm ON v.model_id = vm.model_id
     LEFT JOIN vehicle_fleets AS vf ON v.fleet_id = vf.fleet_id
+    LEFT JOIN cities AS c ON v.city_id = c.city_id
 )
 
 SELECT *

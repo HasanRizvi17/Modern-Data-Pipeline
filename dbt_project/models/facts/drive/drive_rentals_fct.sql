@@ -30,7 +30,12 @@ users AS (
     FROM {{ ref('drive_users_int') }}
 ),
 
-fx_rates AS (
+fx_rates_rental AS (
+    SELECT *
+    FROM {{ ref('ext_fx_rates_int') }}
+),
+
+fx_rates_payment AS (
     SELECT *
     FROM {{ ref('ext_fx_rates_int') }}
 )
@@ -50,6 +55,7 @@ SELECT
     r.reservation_id,
     r.incident_id,
     r.promo_id,
+    v.city_id AS vehicle_city_id,
     u.city_id AS user_city_id,
     u.country_id AS user_country_id,
     u.market_id AS user_market_id,
@@ -79,6 +85,7 @@ SELECT
     r.is_inter_city_travel,
     r.rental_status,
     r.package_name,
+    v.city_name AS vehicle_city,
     v.model_name,
     v.brand,
     v.energy_type,
@@ -93,15 +100,15 @@ SELECT
     r.distance_km,
 
     -- payments / financials
-    {{ convert_to_euro('r.rental_cost', 'fx.rate') }} AS rental_cost_eur,
-    {{ convert_to_euro('f.paid_amount', 'fx.rate') }} AS paid_amount_eur,
-    {{ convert_to_euro('f.refunded_amount', 'fx.rate') }} AS refunded_amount_eur,
-    {{ convert_to_euro('f.failed_amount', 'fx.rate') }} AS failed_amount_eur,
-    {{ convert_to_euro('f.wallet_paid_amount', 'fx.rate') }} AS wallet_paid_amount_eur,
-    {{ convert_to_euro('f.card_paid_amount', 'fx.rate') }} AS card_paid_amount_eur,
-    {{ convert_to_euro('f.discount_amount', 'fx.rate') }} AS discount_amount_eur,
-    {{ convert_to_euro('f.gross_revenue', 'fx.rate') }} AS gross_revenue_eur,
-    {{ convert_to_euro('f.net_revenue', 'fx.rate') }} AS net_revenue_eur,
+    {{ convert_to_euro('r.rental_cost', 'fx_r.rate') }} AS rental_cost_eur,
+    {{ convert_to_euro('f.paid_amount', 'fx_p.rate') }} AS paid_amount_eur,
+    {{ convert_to_euro('f.refunded_amount', 'fx_p.rate') }} AS refunded_amount_eur,
+    {{ convert_to_euro('f.failed_amount', 'fx_p.rate') }} AS failed_amount_eur,
+    {{ convert_to_euro('f.wallet_paid_amount', 'fx_p.rate') }} AS wallet_paid_amount_eur,
+    {{ convert_to_euro('f.card_paid_amount', 'fx_p.rate') }} AS card_paid_amount_eur,
+    {{ convert_to_euro('f.discount_amount', 'fx_p.rate') }} AS discount_amount_eur,
+    {{ convert_to_euro('f.gross_revenue', 'fx_p.rate') }} AS gross_revenue_eur,
+    {{ convert_to_euro('f.net_revenue', 'fx_p.rate') }} AS net_revenue_eur,
     f.has_refund,
     f.used_promotion,
 
@@ -140,4 +147,5 @@ LEFT JOIN payments AS f ON r.rental_id = f.rental_id
 LEFT JOIN ratings AS rt ON r.rental_id = rt.rental_id
 LEFT JOIN issues AS i ON r.rental_id = i.rental_id
 LEFT JOIN users AS u ON r.user_id = u.user_id
-LEFT JOIN fx_rates AS fx ON DATE(r.end_time) = fx.date AND r.currency = fx.from_currency
+LEFT JOIN fx_rates_rental AS fx_r ON DATE(r.end_time) = fx_r.date AND r.currency = fx_r.from_currency
+LEFT JOIN fx_rates_payment AS fx_p ON DATE(r.end_time) = fx_p.date AND f.currency = fx_p.from_currency

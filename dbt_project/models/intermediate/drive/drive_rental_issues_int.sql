@@ -1,13 +1,8 @@
 WITH
 
-support_tickets AS (
+ticket_lifecycle AS (
     SELECT *
-    FROM {{ ref('drive_support_ticket_stg') }}
-),
-
-ticket_history AS (
-    SELECT *
-    FROM {{ ref('drive_ticket_history_stg') }}
+    FROM {{ ref('drive_ticket_lifecycle_int') }}
 ),
 
 incidents AS (
@@ -17,27 +12,18 @@ incidents AS (
 
 tickets_aggregated AS (
     SELECT
-        t.rental_id AS rental_id,
-        ROUND(AVG(satisfaction_rating), 2) AS ticket_support_rating,
+        rental_id,
+        ROUND(AVG(ticket_support_rating), 2) AS ticket_support_rating,
         COUNT(*) AS ticket_count,
-        MIN(t.created_at) AS first_ticket_created_at,
-        MAX(t.created_at) AS last_ticket_created_at
-    FROM support_tickets AS t
-    WHERE t.rental_id IS NOT NULL
-    GROUP BY t.rental_id
-),
-
-ticket_logs AS (
-    SELECT
-        t.rental_id,
-        MAX(CASE WHEN th.new_value = 'escalated' THEN TRUE ELSE FALSE END) AS ticket_has_escalation,
-        MIN(CASE WHEN th.new_value = 'in_progress' THEN changed_at ELSE NULL END) AS ticket_first_response_at,
-        MIN(CASE WHEN th.new_value = 'escalated' THEN changed_at ELSE NULL END) AS ticket_first_escalated_at,
-        MAX(CASE WHEN th.new_value = 'resolved' THEN changed_at ELSE NULL END) AS ticket_resolved_at
-    FROM ticket_history AS th
-    LEFT JOIN support_tickets AS t ON t.ticket_id = th.ticket_id
-    WHERE th.field_changed = 'status'
-    GROUP BY t.rental_id
+        MIN(ticket_created_at) AS first_ticket_created_at,
+        MAX(ticket_created_at) AS last_ticket_created_at,
+        MAX(ticket_has_escalation) AS ticket_has_escalation,
+        MIN(first_response_at) AS ticket_first_response_at,
+        MIN(first_escalated_at) AS ticket_first_escalated_at,
+        MAX(resolved_at) AS ticket_resolved_at
+    FROM ticket_lifecycle
+    WHERE rental_id IS NOT NULL
+    GROUP BY rental_id
 ),
 
 incidents_aggregated AS (
@@ -61,10 +47,10 @@ issues_by_rental AS (
         COALESCE(ta.ticket_count, 0) AS ticket_count,
         ta.first_ticket_created_at,
         ta.last_ticket_created_at,
-        tl.ticket_first_response_at,
-        tl.ticket_first_escalated_at,
-        tl.ticket_resolved_at,
-        tl.ticket_has_escalation,
+        ta.ticket_first_response_at,
+        ta.ticket_first_escalated_at,
+        ta.ticket_resolved_at,
+        ta.ticket_has_escalation,
         CASE
             WHEN COALESCE(ta.ticket_count, 0) > 0 THEN TRUE
             ELSE FALSE
@@ -81,7 +67,6 @@ issues_by_rental AS (
             ELSE FALSE
         END AS has_incident
     FROM tickets_aggregated AS ta
-    LEFT JOIN ticket_logs AS tl ON ta.rental_id = tl.rental_id
     FULL JOIN incidents_aggregated AS i ON i.rental_id = ta.rental_id
 )
 
