@@ -28,7 +28,6 @@ clean-targets: ["target", "dbt_packages"]  # directories to be removed by `dbt c
 
 models:
   modern_data_pipeline:
-    # ----- DriveX Pipeline -----
     staging:
       drive:
         +schema: drive_stg                 # schema refers to the dataset name on BigQuery (save all models created in the models/mdp_stg directory on dbt in the mdp_stg dataset on BigQuery)
@@ -55,12 +54,12 @@ models:
     dimensions:
       drive:
         +schema: drive_dim
-        +materialized: view
+        +materialized: table
         +tags: ['DriveX', 'dimensions']
     marts:
       # default settings for all marts folders
       +schema: drive_mart
-      +materialized: view
+      +materialized: table
       +tags: ['DriveX', 'marts']
     
   elementary:

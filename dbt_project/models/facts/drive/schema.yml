@@ -23,11 +23,17 @@ models:
         description: Identifier of the user who performed the rental.
         tests:
           - not_null
+          - relationships:
+              to: ref('drive_users_dim')
+              field: user_id
 
       - name: vehicle_id
         description: Identifier of the vehicle rented.
         tests:
           - not_null
+          - relationships:
+              to: ref('drive_vehicles_dim')
+              field: vehicle_id
 
       - name: model_id
         description: Vehicle model identifier.
@@ -40,12 +46,24 @@ models:
 
       - name: start_city_id
         description: City identifier where the rental started.
+        tests:
+          - relationships:
+              to: ref('drive_cities_dim')
+              field: city_id
 
       - name: end_city_id
         description: City identifier where the rental ended.
+        tests:
+          - relationships:
+              to: ref('drive_cities_dim')
+              field: city_id
 
       - name: vehicle_city_id
         description: City identifier where the vehicle is assigned.
+        tests:
+          - relationships:
+              to: ref('drive_cities_dim')
+              field: city_id
 
       - name: reservation_id
         description: Identifier of the reservation linked to the rental, if any.
@@ -55,9 +73,17 @@ models:
 
       - name: promo_id
         description: Identifier of the promotion applied to the rental, if any.
+        tests:
+          - relationships:
+              to: ref('drive_promotions_dim')
+              field: promo_id
 
       - name: user_city_id
         description: City identifier associated with the user at rental time.
+        tests:
+          - relationships:
+              to: ref('drive_cities_dim')
+              field: city_id
 
       - name: user_country_id
         description: Country identifier associated with the user at rental time.
@@ -276,11 +302,18 @@ models:
 
       - name: rental_id
         description: Identifier of the rental associated with the ticket, if any.
+        tests:
+          - relationships:
+              to: ref('drive_rentals_fct')
+              field: rental_id
 
       - name: user_id
         description: Identifier of the user who created the support ticket.
         tests:
           - not_null
+          - relationships:
+              to: ref('drive_users_dim')
+              field: user_id
 
       - name: is_linked_to_rental
         description: Indicates whether the ticket is linked to a rental.
@@ -368,14 +401,25 @@ models:
 
       - name: rental_id
         description: Identifier of the rental associated with the incident, if any.
+        tests:
+          - relationships:
+              to: ref('drive_rentals_fct')
+              field: rental_id
 
       - name: vehicle_id
         description: Identifier of the vehicle involved in the incident.
+        tests:
+          - relationships:
+              to: ref('drive_vehicles_dim')
+              field: vehicle_id
 
       - name: customer_id
         description: Identifier of the user involved in the incident.
         tests:
           - not_null
+          - relationships:
+              to: ref('drive_users_dim')
+              field: user_id
 
       - name: incident_status
         description: "{{ doc('incident_status') }}"
@@ -433,6 +477,9 @@ models:
         description: Unique identifier of the promotion.
         tests:
           - not_null
+          - relationships:
+              to: ref('drive_promotions_dim')
+              field: promo_id
 
       - name: promo_code
         description: Normalized promotion code used by the customer.
@@ -460,6 +507,9 @@ models:
         description: Identifier of the rental to which the promotion was applied.
         tests:
           - not_null
+          - relationships:
+              to: ref('drive_rentals_fct')
+              field: rental_id
 
       - name: start_time
         description: Timestamp when the rental started.
@@ -499,6 +549,9 @@ models:
         description: Unique identifier of the user.
         tests:
           - not_null
+          - relationships:
+              to: ref('drive_users_dim')
+              field: user_id
 
       - name: user_city
         description: City associated with the user on the given day.

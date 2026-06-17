@@ -10,11 +10,6 @@ refunds AS (
     FROM {{ ref('drive_refund_stg') }}
 ),
 
-user_promotions AS (
-    SELECT *
-    FROM {{ ref('drive_user_promotion_stg') }}
-),
-
 promotions AS (
     SELECT *
     FROM {{ ref('drive_promotion_stg') }}
@@ -41,11 +36,10 @@ payments_aggregated AS (
 promotions_applied AS (
     SELECT
         r.rental_id,
-        SUM({{ apply_discount('pr.discount_type', 'pr.discount_amount', 'r.rental_cost') }})AS discount_amount
-    FROM user_promotions AS up
-    LEFT JOIN promotions AS pr ON up.promo_id = pr.promo_id
-    INNER JOIN rentals AS r ON r.promo_id = pr.promo_id
-    GROUP BY r.rental_id, r.rental_cost
+        {{ apply_discount('pr.discount_type', 'pr.discount_amount', 'r.rental_cost') }} AS discount_amount
+    FROM rentals AS r
+    INNER JOIN promotions AS pr ON r.promo_id = pr.promo_id
+    WHERE r.promo_id IS NOT NULL
 ),
 
 rental_financials AS (

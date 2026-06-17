@@ -46,8 +46,8 @@ rentals_base AS (
         ec.city_name AS end_city,
         sct.country_name AS start_country,
         ect.country_name AS end_country,
-        CASE 
-          WHEN r.start_city_id = r.end_city_id THEN TRUE
+        CASE
+          WHEN r.start_city_id != r.end_city_id THEN TRUE
           ELSE FALSE
         END AS is_inter_city_travel,
         sct.currency,

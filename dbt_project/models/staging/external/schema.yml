@@ -1,0 +1,35 @@
+version: 2
+
+models:
+  - name: ext_fx_rates_stg
+    description: >
+      Staging model for weekly exchange rates between EUR and other currencies
+      (USD, CAD, GBP), sourced from an external FX rates provider.
+
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - date
+            - from_currency
+            - to_currency
+
+    columns:
+      - name: date
+        description: The date for which the exchange rate is applicable.
+        tests:
+          - not_null
+
+      - name: from_currency
+        description: The base currency code (EUR).
+        tests:
+          - not_null
+
+      - name: to_currency
+        description: The target currency code (USD, CAD, GBP).
+        tests:
+          - not_null
+
+      - name: rate
+        description: The exchange rate from the base currency to the target currency on the given date.
+        tests:
+          - not_null

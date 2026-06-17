@@ -14,7 +14,7 @@ sources:
     # source tables
     tables:
       - name: drive_city_raw
-        description: "Raw table containing JSON data for citiesingested from the DriveX database on MongoDB"
+        description: "Raw table containing JSON data for cities ingested from the DriveX database on MongoDB"
       - name: drive_country_raw
         description: "Raw table containing JSON data for countries ingested from the DriveX database on MongoDB"
       - name: drive_market_raw
