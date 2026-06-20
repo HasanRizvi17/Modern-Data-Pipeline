@@ -81,7 +81,7 @@ models:
           - not_null
           - unique
 
-      - name: city
+      - name: city_name
         description: Name of the city
         tests:
           - not_null
@@ -206,7 +206,7 @@ models:
         tests:
           - not_null
 
-      - name: city
+      - name: city_name
         description: Name of the city associated with the user
         tests:
           - not_null

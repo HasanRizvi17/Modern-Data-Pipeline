@@ -39,13 +39,16 @@ type_casting AS (
 
 standardization AS (
     SELECT
+        -- IDs
         payment_id,
         rental_id,
         user_id,
+        -- attributes
         COALESCE(amount, 0) AS amount,
         {{ standardize_string('status') }} AS status,
         {{ standardize_string('method') }} AS method,
         currency,
+        -- timestamps
         created_at,
         ingestion_timestamp
     FROM type_casting

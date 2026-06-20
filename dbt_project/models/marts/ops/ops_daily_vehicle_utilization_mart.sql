@@ -1,42 +1,70 @@
 WITH
 
-rentals AS (
-
+vehicles AS (
     SELECT *
-    FROM {{ ref('drive_rentals_fct') }}
-    WHERE rental_status != 'cancelled'
+    FROM {{ ref('drive_vehicles_dim') }}
+),
+
+dates AS (
+    SELECT date
+    FROM {{ ref('dates_dim') }}
+    WHERE date <= CURRENT_DATE()
+),
+
+-- vehicle x date spine, bounded to each vehicle's own active window, so
+-- zero-activity dates appear instead of being silently absent
+vehicle_dates AS (
+    SELECT
+        v.vehicle_id,
+        v.model_id,
+        v.fleet_id,
+        v.city_name AS vehicle_city,
+        v.model_name,
+        v.brand,
+        v.energy_type,
+        v.vehicle_segment,
+        v.vehicle_seats,
+        v.fleet_name,
+        v.company_type,
+        d.date
+    FROM vehicles AS v
+    CROSS JOIN dates AS d
+    WHERE d.date >= v.created_date
+),
+
+metrics AS (
+    SELECT *
+    FROM {{ ref('drive_vehicles_daily_metrics_fct') }}
 )
 
 SELECT
     -- IDs
-    vehicle_id,
-    model_id,
-    fleet_id,
+    vd.vehicle_id,
+    vd.model_id,
+    vd.fleet_id,
     -- date
-    end_date AS date,
+    vd.date,
     -- vehicle dimensions
-    vehicle_city,
-    model_name,
-    brand,
-    energy_type,
-    vehicle_segment,
-    vehicle_seats,
-    fleet_name,
-    company_type,
+    vd.vehicle_city,
+    vd.model_name,
+    vd.brand,
+    vd.energy_type,
+    vd.vehicle_segment,
+    vd.vehicle_seats,
+    vd.fleet_name,
+    vd.company_type,
     -- utilization metrics
-    COUNT(DISTINCT rental_id) AS rentals_count,
-    SUM(rental_duration_min) AS total_rental_duration_min,
-    SUM(rental_duration_hour) AS total_rental_duration_hour,
-    SUM(distance_km) AS total_distance_km,
+    COALESCE(m.rentals_count, 0) AS rentals_count,
+    COALESCE(m.total_rental_duration_min, 0) AS total_rental_duration_min,
+    COALESCE(m.total_rental_duration_hour, 0) AS total_rental_duration_hour,
+    COALESCE(m.total_distance_km, 0) AS total_distance_km,
     -- revenue metrics
-    SUM(gross_revenue_eur) AS gross_revenue,
-    SUM(net_revenue_eur) AS net_revenue,
+    COALESCE(m.gross_revenue, 0) AS gross_revenue,
+    COALESCE(m.net_revenue, 0) AS net_revenue,
     -- incidents and support
-    SUM(incident_count) AS incident_count,
-    SUM(critical_incident_count) AS critical_incident_count,
-    SUM(ticket_count) AS ticket_count,
-
-FROM rentals AS r 
-GROUP BY 
-    vehicle_id, model_id, fleet_id, date, vehicle_city, 
-    model_name, brand, energy_type, vehicle_segment, vehicle_seats, fleet_name, company_type
+    COALESCE(m.incident_count, 0) AS incident_count,
+    COALESCE(m.critical_incident_count, 0) AS critical_incident_count,
+    COALESCE(m.ticket_count, 0) AS ticket_count,
+    CURRENT_TIMESTAMP() AS loaded_at
+FROM vehicle_dates AS vd
+LEFT JOIN metrics AS m ON vd.vehicle_id = m.vehicle_id AND vd.date = m.date

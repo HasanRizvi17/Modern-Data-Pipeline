@@ -34,10 +34,13 @@ type_casting AS (
 
 standardization AS (
     SELECT
+        -- IDs
         user_id,
+        city_id,
+        -- attributes
         {{ standardize_string('email') }} AS email,
         {{ standardize_string('status') }} AS status,
-        city_id,
+        -- timestamps
         created_at,
         updated_at,
         ingestion_timestamp

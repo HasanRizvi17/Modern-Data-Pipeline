@@ -10,6 +10,11 @@ incidents AS (
     FROM {{ ref('drive_incident_stg') }}
 ),
 
+rentals AS (
+    SELECT *
+    FROM {{ ref('drive_rental_base_int') }}
+),
+
 tickets_aggregated AS (
     SELECT
         rental_id,
@@ -42,6 +47,9 @@ incidents_aggregated AS (
 issues_by_rental AS (
     SELECT
         COALESCE(ta.rental_id, i.rental_id) AS rental_id,
+        r.user_id,
+        r.vehicle_id,
+        r.start_city_id AS city_id,
         -- support tickets
         ta.ticket_support_rating,
         COALESCE(ta.ticket_count, 0) AS ticket_count,
@@ -68,6 +76,7 @@ issues_by_rental AS (
         END AS has_incident
     FROM tickets_aggregated AS ta
     FULL JOIN incidents_aggregated AS i ON i.rental_id = ta.rental_id
+    LEFT JOIN rentals AS r ON r.rental_id = COALESCE(ta.rental_id, i.rental_id)
 )
 
 SELECT *

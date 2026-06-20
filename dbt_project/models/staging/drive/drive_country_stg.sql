@@ -36,11 +36,14 @@ type_casting AS (
 
 standardization AS (
     SELECT
+        -- IDs
         country_id,
+        market_id,
+        -- attributes
         country_name,
         iso_code,
         currency,
-        market_id,
+        -- timestamps
         created_at,
         updated_at,
         ingestion_timestamp

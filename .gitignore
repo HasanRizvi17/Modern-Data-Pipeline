@@ -27,6 +27,10 @@ keys/
 .env                       # Environment variables file (often contains secrets)
 venv/                      # Virtual environment folder
 
+# Other
+documentation/
+.obsidian/
+dbt_project/.obsidian/
 
 # - Python: You don’t want temporary .pyc files or local virtual environments in Git.
 # - dbt: Only your source models matter; compiled models and logs are generated locally.

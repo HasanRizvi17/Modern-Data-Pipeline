@@ -4,19 +4,17 @@ models:
   - name: mkt_daily_promotions_performance_mart
     description: >
       Daily marketing mart analyzing promotion performance in the car-sharing
-      business. Aggregated at promotion-date-city-package level, this mart
-      tracks promotion redemptions, rental revenue, discount cost, and ROI to
-      evaluate promotional effectiveness across markets and travel patterns.
+      business. Aggregated at promotion-date level on a full promo x date
+      spine bounded to each promotion's active window (including forward-dated
+      windows), so zero-redemption days appear rather than being silently
+      absent. Tracks redemptions, redemption-rate/repeat-usage, rental
+      revenue, and discount cost to evaluate promotional effectiveness.
 
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - promo_id
             - date
-            - start_city
-            - end_city
-            - is_inter_city_travel
-            - package_name
 
       - dbt_utils.expression_is_true:
           expression: "rentals >= 0"
@@ -31,7 +29,10 @@ models:
           expression: "rental_revenue >= discount_amount"
 
       - dbt_utils.expression_is_true:
-          expression: "date <= CURRENT_DATE()"
+          expression: "redemptions >= 0"
+
+      - dbt_utils.expression_is_true:
+          expression: "unique_users_redeemed <= redemptions"
 
     columns:
       - name: promo_id
@@ -46,32 +47,39 @@ models:
         description: Type of discount applied by the promotion.
 
       - name: date
-        description: Calendar date on which the promotion was redeemed.
+        description: Calendar date within the promotion's active window.
         tests:
           - not_null
 
-      - name: start_city
-        description: City where the rental started.
-
-      - name: end_city
-        description: City where the rental ended.
-
-      - name: is_inter_city_travel
-        description: Indicates whether the rental involved travel between cities.
-
-      - name: package_name
-        description: "{{ doc('rental_package') }}"
-
       - name: rentals
-        description: Number of distinct rentals where the promotion was redeemed.
+        description: Number of distinct rentals where the promotion was redeemed on the date.
 
       - name: rental_revenue
-        description: Total rental revenue generated from rentals using the promotion.
+        description: Total rental revenue generated from rentals using the promotion on the date, in EUR.
 
       - name: discount_amount
-        description: Total discount amount granted by the promotion on the date.
+        description: Total discount amount granted by the promotion on the date, in EUR.
 
-      - name: roi
+      - name: redemptions
+        description: Number of redemption events recorded for the promotion on the date, from drive_user_promotion_stg.
+
+      - name: unique_users_redeemed
+        description: Number of distinct users who redeemed the promotion on the date.
+
+      - name: repeat_redemptions
+        description: Number of redemption events on the date that were not the redeeming user's first redemption of this promotion.
+
+      - name: discount_payback_ratio
         description: >
-          Return on investment of the promotion, calculated as
-          (rental_revenue - discount_amount) / discount_amount.
+          (rental_revenue - discount_amount) / discount_amount. Not a true ROI:
+          it ignores ad spend and doesn't net out revenue the customer would
+          have generated without the promo. Relabeled from "roi" for that reason.
+
+      - name: rolling_7d_discount_payback_ratio
+        description: >
+          discount_payback_ratio computed over rental_revenue and discount_amount
+          summed across the trailing 7 days (current date inclusive) for this
+          promo, rather than averaging the daily ratios.
+
+      - name: loaded_at
+        description: Timestamp at which this mart row was last built.

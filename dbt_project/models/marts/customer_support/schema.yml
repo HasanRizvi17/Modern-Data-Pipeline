@@ -14,7 +14,7 @@ models:
             - ticket_id
 
       - dbt_utils.expression_is_true:
-          expression: "ticket_created_at <= CURRENT_TIMESTAMP()"
+          expression: "ticket_created_at <= CURRENT_DATETIME('Europe/Berlin')"
 
       - dbt_utils.expression_is_true:
           expression: "ticket_updated_at >= ticket_created_at"
@@ -42,6 +42,12 @@ models:
 
       - name: user_id
         description: Identifier of the user who created the support ticket.
+
+      - name: user_city_id
+        description: Identifier of the home city of the user who created the support ticket.
+
+      - name: user_city
+        description: Home city name of the user who created the support ticket (distinct from any rental's start/end city).
 
       - name: is_linked_to_rental
         description: Indicates whether the support ticket is linked to a rental.
@@ -94,8 +100,11 @@ models:
       - name: resolution_time_hours
         description: Time in hours between ticket creation and resolution.
 
-      - name: resolved_within_24hrs
-        description: Indicates whether the ticket was resolved within 24 hours.
+      - name: sla_target_hours
+        description: Target resolution time in hours for the ticket's priority, per support_ticket_sla_targets.
+
+      - name: resolved_within_sla
+        description: Indicates whether the ticket was resolved within its priority's SLA target (see sla_target_hours).
 
       - name: ticket_created_at
         description: Timestamp when the support ticket was created.
@@ -220,7 +229,7 @@ models:
       - name: has_refund
         description: Indicates whether the rental has any refund.
 
-      - name: used_promotion
+      - name: has_promotion
         description: Indicates whether a promotion was used.
 
       # -----------------------
@@ -243,7 +252,7 @@ models:
     description: >
       Customer support daily KPI mart for the car-sharing business. Aggregated
       at date, ticket attributes, and linkage level, this mart supports both
-      created-date and closed-date analyses to monitor ticket volume, resolution
+      created-date and resolved-date analyses to monitor ticket volume, resolution
       performance, escalations, response times, and customer satisfaction.
       Designed for flexible BI reporting via date-type switching.
 
@@ -253,6 +262,7 @@ models:
             - date_type
             - date
             - is_linked_to_rental
+            - user_city
             - category
             - subject
             - priority
@@ -282,7 +292,7 @@ models:
         tests:
           - not_null
           - accepted_values:
-              values: ['created', 'closed']
+              values: ['created', 'resolved']
 
       - name: date
         description: Calendar date used for aggregating ticket KPIs.
@@ -291,6 +301,9 @@ models:
 
       - name: is_linked_to_rental
         description: Indicates whether the support tickets are linked to rentals.
+
+      - name: user_city
+        description: Home city name of the users who created the support tickets in this group.
 
       - name: category
         description: "{{ doc('support_ticket_category') }}"
@@ -325,11 +338,20 @@ models:
       - name: avg_resolution_time_hours
         description: Average time in hours from ticket creation to resolution.
 
-      - name: tickets_resolved_within_24hrs
-        description: Number of tickets resolved within 24 hours of creation.
+      - name: tickets_resolved_within_sla
+        description: Number of tickets resolved within their priority's SLA target.
 
       - name: avg_ticket_support_rating
         description: Average customer satisfaction rating for support tickets.
 
       - name: total_rentals
         description: Total number of rentals on the corresponding date, used to compute contact rates in BI tools.
+
+      - name: rolling_7d_ticket_volume
+        description: >
+          Total ticket volume (across all dimension breakdowns) summed over the
+          trailing 7 days for this date_type (current date inclusive).
+          Independent of the row's own dimension breakdown.
+
+      - name: loaded_at
+        description: Timestamp at which this mart row was last built.

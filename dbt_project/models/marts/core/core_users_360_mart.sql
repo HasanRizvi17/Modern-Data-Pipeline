@@ -3,7 +3,7 @@ WITH
 users AS (
     SELECT
         user_id,
-        city,
+        city_name,
         country,
         market,
         user_tenure_days,
@@ -14,12 +14,25 @@ users AS (
 users_daily_metrics AS (
     SELECT *
     FROM {{ ref('drive_users_daily_metrics_fct') }}
+),
+
+-- rolling 30d activity recency, joined separately so it doesn't affect the
+-- lifetime aggregates above
+rolling_30d AS (
+    SELECT
+        user_id,
+        COUNT(DISTINCT date) AS rolling_30d_active_days,
+        COALESCE(SUM(rentals_count), 0) AS rolling_30d_rentals,
+        COALESCE(SUM(net_revenue), 0) AS rolling_30d_net_revenue
+    FROM users_daily_metrics
+    WHERE date >= DATE_SUB(CURRENT_DATE(), INTERVAL 29 DAY)
+    GROUP BY user_id
 )
 
 SELECT
     -- grain
     u.user_id,
-    u.city AS user_city,
+    u.city_name AS user_city,
     u.country AS user_country,
     u.market AS user_market, 
     u.user_tenure_days,
@@ -84,9 +97,16 @@ SELECT
     -- incidents
     COALESCE(SUM(incident_count), 0) AS incident_count,
     COALESCE(SUM(critical_incident_count), 0) AS critical_incident_count,
-    COALESCE(SUM(rentals_with_incident), 0) AS rentals_with_incident
+    COALESCE(SUM(rentals_with_incident), 0) AS rentals_with_incident,
 
+    -- rolling metrics
+    COALESCE(ANY_VALUE(r30.rolling_30d_active_days), 0) AS rolling_30d_active_days,
+    COALESCE(ANY_VALUE(r30.rolling_30d_rentals), 0) AS rolling_30d_rentals,
+    COALESCE(ANY_VALUE(r30.rolling_30d_net_revenue), 0) AS rolling_30d_net_revenue,
+
+    CURRENT_TIMESTAMP() AS loaded_at
 
 FROM users AS u
 LEFT JOIN users_daily_metrics AS r ON u.user_id = r.user_id
+LEFT JOIN rolling_30d AS r30 ON u.user_id = r30.user_id
 GROUP BY u.user_id, user_city, user_country, user_market, u.user_tenure_days, u.user_tenure_days_group

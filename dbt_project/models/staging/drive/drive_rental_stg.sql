@@ -52,20 +52,23 @@ type_casting AS (
 
 standardization AS (
     SELECT
+        -- IDs
         rental_id,
         user_id,
         vehicle_id,
         package_id,
         start_city_id,
         end_city_id,
+        promo_id,
+        reservation_id,
+        incident_id,
+        -- attributes
         start_time,
         end_time,
         {{ standardize_string('status') }} AS status,
         COALESCE(distance_km, 0) AS distance_km,
         COALESCE(rental_cost, 0) AS rental_cost,
-        promo_id,
-        reservation_id,
-        incident_id,
+        -- timestamps
         created_at,
         DATE(created_at) AS created_date,
         updated_at,

@@ -20,7 +20,7 @@ markets AS (
 cities_data AS (
     SELECT
         c.city_id,
-        c.city_name AS city,
+        c.city_name,
         co.country_name AS country,
         co.iso_code,
         m.market_name AS market,

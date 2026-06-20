@@ -1,0 +1,5 @@
+priority,target_hours
+critical,4
+high,12
+medium,24
+low,72

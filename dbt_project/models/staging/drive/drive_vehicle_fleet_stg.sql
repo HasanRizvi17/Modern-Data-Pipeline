@@ -33,10 +33,13 @@ type_casting AS (
 
 standardization AS (
     SELECT
+        -- IDs
         fleet_id,
+        city_id,
+        -- attributes
         {{ standardize_string('fleet_name', lower='no') }} AS fleet_name,
         {{ standardize_string('company_type') }} AS company_type,
-        city_id,
+        -- timestamps
         created_at,
         ingestion_timestamp
     FROM type_casting
