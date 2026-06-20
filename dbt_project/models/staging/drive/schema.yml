@@ -873,7 +873,7 @@ models:
               to: ref('drive_city_stg')
               field: city_id
 
-      - name: type
+      - name: incident_type
         description: "{{ doc('incident_type') }}"
         tests:
           - not_null

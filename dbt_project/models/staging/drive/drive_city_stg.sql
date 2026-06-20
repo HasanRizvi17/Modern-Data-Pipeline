@@ -34,10 +34,13 @@ type_casting AS (
 
 standardization AS (
     SELECT
+        -- IDs
         city_id,
         country_id,
+        -- attributes
         {{ standardize_string('city_name', lower='no') }} AS city_name,
         {{ standardize_string('timezone', lower='no') }} AS timezone,
+        -- timestamps
         created_at,
         updated_at,
         ingestion_timestamp

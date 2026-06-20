@@ -5,8 +5,8 @@ WITH
 date_spine AS (
     {{ dbt_utils.date_spine(
         datepart = "day",
-        start_date = "(SELECT MIN(DATE(created_at)) FROM " ~ ref('drive_rental_stg') ~ ")",
-        end_date   = "(SELECT MAX(DATE(created_at)) FROM " ~ ref('drive_rental_stg') ~ ")"
+        start_date = "DATE('2024-07-01')",
+        end_date   = "DATE_ADD(CURRENT_DATE(), INTERVAL 365 DAY)"
     ) }}
 )
 

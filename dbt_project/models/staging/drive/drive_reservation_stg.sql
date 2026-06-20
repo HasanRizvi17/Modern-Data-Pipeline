@@ -46,18 +46,21 @@ type_casting AS (
 
 standardization AS (
     SELECT
+        -- IDs
         reservation_id,
         user_id,
         vehicle_id,
         city_id,
         package_id,
+        rental_id,
+        -- attributes
+        {{ standardize_string('status') }} AS status,
+        {{ standardize_string('cancellation_reason') }} AS cancellation_reason,
+        -- timestamps
         reserved_at,
         reservation_start_at,
         reservation_end_at,
-        {{ standardize_string('status') }} AS status,
-        {{ standardize_string('cancellation_reason') }} AS cancellation_reason,
         cancelled_at,
-        rental_id,
         created_at,
         updated_at,
         ingestion_timestamp

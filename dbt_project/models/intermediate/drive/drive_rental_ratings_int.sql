@@ -7,12 +7,14 @@ rental_ratings AS (
 
 rentals AS (
     SELECT *
-    FROM {{ ref('drive_rental_stg') }}
+    FROM {{ ref('drive_rental_base_int') }}
 ),
 
 ratings_data AS (
     SELECT
         rr.rental_id,
+        r.user_id,
+        r.vehicle_id,
         rr.score,
         rr.comment,
         rr.created_at,
@@ -24,7 +26,9 @@ ratings_data AS (
 
 ratings_aggregated AS (
     SELECT
-        rental_id AS rental_id,
+        rental_id,
+        ANY_VALUE(user_id) AS user_id,
+        ANY_VALUE(vehicle_id) AS vehicle_id,
         AVG(score) AS avg_rating_value,
         COUNT(*) AS rating_count,
         MIN(rating_delay_hours) AS first_rating_delay_hours,

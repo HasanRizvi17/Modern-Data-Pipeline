@@ -33,10 +33,13 @@ type_casting AS (
 
 standardization AS (
     SELECT
+        -- IDs
         rating_id,
         rental_id,
+        -- attributes
         COALESCE(score, 0) AS score,
         {{ standardize_string('comment') }} AS comment,
+        -- timestamps
         created_at,
         ingestion_timestamp
     FROM type_casting

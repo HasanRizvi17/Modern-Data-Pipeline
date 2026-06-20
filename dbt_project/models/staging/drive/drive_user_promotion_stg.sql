@@ -30,8 +30,10 @@ type_casting AS (
 
 standardization AS (
     SELECT
+        -- IDs
         user_id,
         promo_id,
+        -- timestamps
         redeemed_at,
         created_at,
         ingestion_timestamp

@@ -10,11 +10,18 @@ ticket_history AS (
     FROM {{ ref('drive_ticket_history_stg') }}
 ),
 
+users AS (
+    SELECT *
+    FROM {{ ref('drive_users_int') }}
+),
+
 ticket_lifecycle AS (
     SELECT
         t.ticket_id,
         t.rental_id,
         t.user_id,
+        u.city_id AS user_city_id,
+        u.city_name AS user_city,
         CASE WHEN t.rental_id IS NOT NULL THEN TRUE ELSE FALSE END AS is_linked_to_rental,
         t.category,
         t.subject,
@@ -32,11 +39,12 @@ ticket_lifecycle AS (
         t.created_at AS ticket_created_at,
         t.updated_at AS ticket_updated_at
     FROM tickets AS t
+    LEFT JOIN users AS u ON t.user_id = u.user_id
     LEFT JOIN ticket_history AS th ON t.ticket_id = th.ticket_id
     WHERE th.field_changed = 'status'
     GROUP BY
-        t.ticket_id, t.rental_id, t.user_id, t.category, t.subject, t.description, t.priority, t.status, t.channel,
-        ticket_support_rating, ticket_created_at, ticket_updated_at
+        t.ticket_id, t.rental_id, t.user_id, u.city_id, u.city_name, t.category, t.subject, t.description, t.priority,
+        t.status, t.channel, ticket_support_rating, ticket_created_at, ticket_updated_at
 )
 
 SELECT *

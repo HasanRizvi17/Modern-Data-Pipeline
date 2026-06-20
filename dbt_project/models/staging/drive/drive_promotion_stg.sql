@@ -37,12 +37,15 @@ type_casting AS (
 
 standardization AS (
     SELECT
+        -- IDs
         promo_id,
+        -- attributes
         {{ standardize_string('promo_code') }} AS promo_code,
         discount_amount,
         {{ standardize_string('discount_type') }} AS discount_type,
         start_date,
         end_date,
+        -- timestamps
         created_at,
         ingestion_timestamp
     FROM type_casting

@@ -2,7 +2,7 @@ WITH
 
 rentals AS (
     SELECT *
-    FROM {{ ref('drive_rentals_base_int') }}
+    FROM {{ ref('drive_rental_base_int') }}
 ),
 
 ratings AS (
@@ -33,11 +33,6 @@ users AS (
 fx_rates_rental AS (
     SELECT *
     FROM {{ ref('ext_fx_rates_int') }}
-),
-
-fx_rates_payment AS (
-    SELECT *
-    FROM {{ ref('ext_fx_rates_int') }}
 )
 
 SELECT
@@ -60,13 +55,15 @@ SELECT
     u.country_id AS user_country_id,
     u.market_id AS user_market_id,
     -- user details
+    u.user_email,
     u.user_status,
-    u.city AS user_city,
+    u.city_name AS user_city,
     u.country AS user_country,
-    u.market AS user_market, 
-    u.user_tenure_days, 
-    u.user_tenure_days_group, 
-    u.is_active_user, 
+    u.market AS user_market,
+    u.iso_code AS user_iso_code,
+    u.user_tenure_days,
+    u.user_tenure_days_group,
+    u.is_active_user,
     u.is_validated_user,
     -- rental times
     r.start_time,
@@ -99,18 +96,18 @@ SELECT
     r.rental_duration_hour,
     r.distance_km,
 
-    -- payments / financials
+    -- payments / financials (already converted to EUR in drive_rental_payments_int)
     {{ convert_to_euro('r.rental_cost', 'fx_r.rate') }} AS rental_cost_eur,
-    {{ convert_to_euro('f.paid_amount', 'fx_p.rate') }} AS paid_amount_eur,
-    {{ convert_to_euro('f.refunded_amount', 'fx_p.rate') }} AS refunded_amount_eur,
-    {{ convert_to_euro('f.failed_amount', 'fx_p.rate') }} AS failed_amount_eur,
-    {{ convert_to_euro('f.wallet_paid_amount', 'fx_p.rate') }} AS wallet_paid_amount_eur,
-    {{ convert_to_euro('f.card_paid_amount', 'fx_p.rate') }} AS card_paid_amount_eur,
-    {{ convert_to_euro('f.discount_amount', 'fx_p.rate') }} AS discount_amount_eur,
-    {{ convert_to_euro('f.gross_revenue', 'fx_p.rate') }} AS gross_revenue_eur,
-    {{ convert_to_euro('f.net_revenue', 'fx_p.rate') }} AS net_revenue_eur,
+    f.paid_amount AS paid_amount_eur,
+    f.refunded_amount AS refunded_amount_eur,
+    f.failed_amount AS failed_amount_eur,
+    f.wallet_paid_amount AS wallet_paid_amount_eur,
+    f.card_paid_amount AS card_paid_amount_eur,
+    f.discount_amount AS discount_amount_eur,
+    f.gross_revenue AS gross_revenue_eur,
+    f.net_revenue AS net_revenue_eur,
     f.has_refund,
-    f.used_promotion,
+    f.has_promotion,
 
     -- ratings
     rt.avg_rating_value,
@@ -148,4 +145,3 @@ LEFT JOIN ratings AS rt ON r.rental_id = rt.rental_id
 LEFT JOIN issues AS i ON r.rental_id = i.rental_id
 LEFT JOIN users AS u ON r.user_id = u.user_id
 LEFT JOIN fx_rates_rental AS fx_r ON DATE(r.end_time) = fx_r.date AND r.currency = fx_r.from_currency
-LEFT JOIN fx_rates_payment AS fx_p ON DATE(r.end_time) = fx_p.date AND f.currency = fx_p.from_currency

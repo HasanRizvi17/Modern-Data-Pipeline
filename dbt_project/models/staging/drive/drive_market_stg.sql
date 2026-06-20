@@ -30,8 +30,11 @@ type_casting AS (
 
 standardization AS (
     SELECT
+        -- IDs
         market_id,
+        -- attributes
         {{ standardize_string('market_name') }} AS market_name,
+        -- timestamps
         created_at,
         updated_at,
         ingestion_timestamp

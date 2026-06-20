@@ -51,20 +51,23 @@ type_casting AS (
 
 standardization AS (
     SELECT
+        -- IDs
         incident_id,
         rental_id,
         user_id,
         vehicle_id,
         city_id,
-        reported_at,
-        incident_time,
+        -- attributes
         {{ standardize_string('status') }} AS status,
         {{ standardize_string('incident_type') }} AS incident_type,
         {{ standardize_string('severity') }} AS severity,
         {{ standardize_string('description') }} AS description,
         COALESCE(estimated_cost, 0) AS estimated_cost,
-        resolved_at,
         police_report_filed,
+        -- timestamps
+        reported_at,
+        incident_time,
+        resolved_at,
         created_at,
         updated_at,
         ingestion_timestamp

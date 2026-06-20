@@ -58,7 +58,7 @@ tickets_360 AS (
         r.gross_revenue_eur AS gross_revenue,
         r.net_revenue_eur AS net_revenue,
         r.has_refund,
-        r.used_promotion,
+        r.has_promotion,
         -- ratings
         r.avg_rating_value,
         r.rating_count,

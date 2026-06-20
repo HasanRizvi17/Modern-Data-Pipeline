@@ -1,9 +1,11 @@
 WITH 
 
+-- completed rentals only: 'ongoing' rentals have no end_date yet, so they
+-- can't be assigned to a date bucket in this daily aggregation
 rentals AS (
     SELECT *
     FROM {{ ref('drive_rentals_fct') }}
-    WHERE rental_status != 'cancelled'
+    WHERE rental_status = 'completed'
 )
 
 SELECT

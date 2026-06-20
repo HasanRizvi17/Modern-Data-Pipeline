@@ -8,6 +8,8 @@ rentals AS (
 )
 
 SELECT
+    -- passthrough of all rental fact columns except the EUR-converted financials,
+    -- which are exposed below under their original (non-suffixed) names
     * EXCEPT(
         rental_cost_eur, paid_amount_eur, refunded_amount_eur, failed_amount_eur,
         wallet_paid_amount_eur, card_paid_amount_eur, discount_amount_eur,

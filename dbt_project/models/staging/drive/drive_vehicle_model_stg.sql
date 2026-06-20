@@ -37,12 +37,15 @@ type_casting AS (
 
 standardization AS (
     SELECT
+        -- IDs
         model_id,
+        -- attributes
         {{ standardize_string('model_name') }} AS model_name,
         {{ standardize_string('brand') }} AS brand,
         {{ standardize_string('energy_type') }} AS energy_type,
         {{ standardize_string('segment') }} AS segment,
         COALESCE(seats, 0) AS seats,
+        -- timestamps
         created_at,
         ingestion_timestamp
     FROM type_casting

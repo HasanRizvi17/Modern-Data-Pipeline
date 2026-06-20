@@ -31,7 +31,7 @@ users_data AS (
         u.email AS user_email,
         u.status AS user_status,
         -- user geography
-        c.city_name AS city,
+        c.city_name,
         co.country_name AS country,
         co.iso_code,
         m.market_name AS market,

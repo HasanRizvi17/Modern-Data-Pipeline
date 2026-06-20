@@ -37,13 +37,16 @@ type_casting AS (
 
 standardization AS (
     SELECT
+        -- IDs
         history_id,
         ticket_id,
-        changed_at,
+        -- attributes
         {{ standardize_string('changed_by') }} AS changed_by,
-        {{ standardize_string('field_changed') }} AS field_changed, 
+        {{ standardize_string('field_changed') }} AS field_changed,
         {{ standardize_string('old_value') }} AS old_value,
         {{ standardize_string('new_value') }} AS new_value,
+        -- timestamps
+        changed_at,
         ingestion_timestamp
     FROM type_casting
 )

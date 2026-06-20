@@ -14,7 +14,7 @@ models:
             - incident_id
 
       - dbt_utils.expression_is_true:
-          expression: "incident_created_at <= CURRENT_TIMESTAMP()"
+          expression: "incident_created_at <= CURRENT_DATETIME('Europe/Berlin')"
 
       - dbt_utils.expression_is_true:
           expression: "incident_updated_at >= incident_created_at"
@@ -43,7 +43,7 @@ models:
       - name: vehicle_id
         description: Identifier of the vehicle involved in the incident.
 
-      - name: customer_id
+      - name: user_id
         description: Identifier of the user involved in the incident.
 
       - name: incident_type
@@ -181,7 +181,7 @@ models:
       - name: has_refund
         description: Indicates whether the rental has any refund.
 
-      - name: used_promotion
+      - name: has_promotion
         description: Indicates whether a promotion was used on the rental.
 
       # -----------------------
@@ -289,6 +289,9 @@ models:
 
       - name: total_rentals
         description: Total number of rentals on the corresponding date, used to compute incident rates in BI tools.
+
+      - name: loaded_at
+        description: Timestamp at which this mart row was last built.
 
 
   - name: ops_daily_vehicle_utilization_mart
@@ -408,3 +411,6 @@ models:
 
       - name: ticket_count
         description: Total number of support tickets associated with the vehicle on the date.
+
+      - name: loaded_at
+        description: Timestamp at which this mart row was last built.

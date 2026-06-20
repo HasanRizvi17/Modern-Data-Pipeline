@@ -32,7 +32,7 @@ models:
         tests:
           - not_null
 
-      - name: city
+      - name: city_name
         description: Name of the city associated with the user
 
       - name: country
@@ -168,7 +168,7 @@ models:
           - not_null
 
 
-  - name: drive_rentals_base_int
+  - name: drive_rental_base_int
     description: >
       Intermediate model serving as the core rental spine, enriching rental
       records with user, vehicle, geography, and pricing context.
@@ -219,10 +219,25 @@ models:
       - name: end_city
         description: Name of the rental end city
 
+      - name: start_country
+        description: Name of the rental start country
+
+      - name: end_country
+        description: Name of the rental end country
+
+      - name: is_inter_city_travel
+        description: Indicates whether the rental started and ended in different cities
+
+      - name: currency
+        description: Currency of the rental's start country, used as the rental's local currency
+
       - name: rental_status
         description: "{{ doc('rental_status') }}"
         tests:
           - not_null
+
+      - name: package_name
+        description: "{{ doc('rental_package') }}"
 
       - name: start_time
         description: Timestamp at which the rental was started
@@ -242,23 +257,39 @@ models:
         tests:
           - not_null
 
+      - name: distance_km
+        description: Distance driven during the rental in kilometers
+
       - name: rental_cost
         description: Base cost of the rental before discounts
         tests:
           - not_null
 
-      - name: discount_amount
-        description: Discount amount applied to the rental
+      - name: reserved_at
+        description: Timestamp when the rental was reserved
 
-      - name: final_cost
-        description: Final charged amount for the rental after discounts
-        tests:
-          - not_null
+      - name: reservation_start_at
+        description: Scheduled start time of the reservation
+
+      - name: reservation_end_at
+        description: Scheduled end time of the reservation
+
+      - name: status
+        description: Status of the reservation linked to the rental
+
+      - name: cancellation_reason
+        description: Reason the reservation was cancelled, if applicable
+
+      - name: cancelled_at
+        description: Timestamp at which the reservation was cancelled, if applicable
 
       - name: created_at
         description: Timestamp at which the rental was created
         tests:
           - not_null
+
+      - name: created_date
+        description: Date at which the rental was created
 
       - name: updated_at
         description: Timestamp at which the rental was last updated
@@ -271,8 +302,9 @@ models:
 
   - name: drive_rental_payments_int
     description: >
-      Intermediate model collapsing payments and applied-promotion records on
-      rental-level, including refund-related attributes.
+      Intermediate model collapsing payments, refunds, and applied-promotion
+      records onto rental-level grain, with all amounts converted to EUR so
+      rentals paid across multiple currencies still collapse to one row.
       One row per rental.
 
     columns:
@@ -282,37 +314,34 @@ models:
           - not_null
           - unique
 
-      - name: currency
-        description: Currency in which the payments were processed
-
       - name: paid_amount
-        description: Total successfully paid amount for the rental
+        description: Total successfully paid amount for the rental, in EUR
 
       - name: refunded_amount
-        description: Total refunded amount for the rental
+        description: Total refunded amount for the rental, in EUR, sourced from drive_refund_stg (captures partial refunds)
 
       - name: failed_amount
-        description: Total failed payment amount for the rental
+        description: Total failed payment amount for the rental, in EUR
 
       - name: wallet_paid_amount
-        description: Portion of the paid amount made via wallet
+        description: Portion of the paid amount made via wallet, in EUR
 
       - name: card_paid_amount
-        description: Portion of the paid amount made via card
+        description: Portion of the paid amount made via card, in EUR
 
       - name: discount_amount
-        description: Total discount amount applied to the rental via promotions
+        description: Total discount amount applied to the rental via promotions, in EUR
 
       - name: gross_revenue
-        description: Paid amount plus any discount granted, before refunds
+        description: Paid amount plus any discount granted, before refunds, in EUR
 
       - name: net_revenue
-        description: Paid amount net of refunds
+        description: Paid amount net of refunds, in EUR
 
       - name: has_refund
         description: Boolean flag indicating whether the rental has any refund
 
-      - name: used_promotion
+      - name: has_promotion
         description: Boolean flag indicating whether a promotion was applied to the rental
 
 
@@ -344,6 +373,12 @@ models:
           - relationships:
               to: ref('drive_users_dim')
               field: user_id
+
+      - name: user_city_id
+        description: Identifier of the home city of the user who created the support ticket
+
+      - name: user_city
+        description: Home city name of the user who created the support ticket (distinct from any rental's start/end city)
 
       - name: is_linked_to_rental
         description: Indicates whether the ticket is linked to a rental
@@ -384,123 +419,116 @@ models:
       One row per rental.
 
     columns:
-      - name: rating_id
-        description: Unique identifier of the rental rating
-        tests:
-          - not_null
-          - unique
-
       - name: rental_id
         description: Unique identifier of the rental
         tests:
           - not_null
+          - unique
 
       - name: user_id
-        description: Unique identifier of the user
-
-      - name: score
-        description: Rating score provided by the user
+        description: Identifier of the user who rented, joined from drive_rental_base_int
         tests:
-          - not_null
-
-      - name: comment
-        description: Optional free-text comment provided by the user
+          - relationships:
+              to: ref('drive_users_dim')
+              field: user_id
 
       - name: vehicle_id
-        description: Unique identifier of the vehicle
-
-      - name: city
-        description: Name of the city where the rental occurred
-
-      - name: country
-        description: Name of the country where the rental occurred
-
-      - name: market
-        description: Name of the market where the rental occurred
-
-      - name: created_at
-        description: Timestamp at which the rating was created
+        description: Identifier of the vehicle rented, joined from drive_rental_base_int
         tests:
-          - not_null
+          - relationships:
+              to: ref('drive_vehicles_dim')
+              field: vehicle_id
 
-      - name: ingestion_timestamp
-        description: Timestamp at which the rating record was ingested into the analytics warehouse
-        tests:
-          - not_null
+      - name: avg_rating_value
+        description: Average rating score across all ratings for the rental
+
+      - name: rating_count
+        description: Number of ratings submitted for the rental
+
+      - name: first_rating_delay_hours
+        description: Hours between rental end and the earliest rating submitted
+
+      - name: is_5_star_rating
+        description: Indicates whether the rental's average rating is a perfect 5 stars
+
+      - name: is_1_star_rating
+        description: Indicates whether the rental's average rating is the lowest, 1 star
 
 
   - name: drive_rental_issues_int
     description: >
-      Intermediate model combining rental incidents with associated support
-      ticket information for operational and customer support analysis.
-      One row per rental.
+      Intermediate model combining aggregated support-ticket and incident
+      activity for each rental. One row per rental; multiple tickets/incidents
+      on the same rental are rolled up into counts, not individual rows.
 
     columns:
-      - name: incident_id
-        description: Unique identifier of the incident
-        tests:
-          - not_null
-          - unique
-
       - name: rental_id
         description: Unique identifier of the rental
         tests:
           - not_null
+          - unique
 
       - name: user_id
-        description: Unique identifier of the user
+        description: Identifier of the user who rented, joined from drive_rental_base_int
         tests:
-          - not_null
+          - relationships:
+              to: ref('drive_users_dim')
+              field: user_id
 
       - name: vehicle_id
-        description: Unique identifier of the vehicle
+        description: Identifier of the vehicle rented, joined from drive_rental_base_int
         tests:
-          - not_null
+          - relationships:
+              to: ref('drive_vehicles_dim')
+              field: vehicle_id
 
       - name: city_id
-        description: Unique identifier of the city
-        tests:
-          - not_null
+        description: Identifier of the rental's start city, joined from drive_rental_base_int
 
-      - name: type
-        description: Category of the incident
-        tests:
-          - not_null
+      - name: ticket_support_rating
+        description: Average satisfaction rating across support tickets linked to the rental
 
-      - name: severity
-        description: Severity level of the incident
-        tests:
-          - not_null
+      - name: ticket_count
+        description: Number of support tickets linked to the rental
 
-      - name: status
-        description: Current processing status of the incident
-        tests:
-          - not_null
+      - name: first_ticket_created_at
+        description: Timestamp of the earliest support ticket linked to the rental
 
-      - name: ticket_id
-        description: Unique identifier of the support ticket
+      - name: last_ticket_created_at
+        description: Timestamp of the latest support ticket linked to the rental
 
-      - name: ticket_category
-        description: Category of the support ticket
+      - name: ticket_first_response_at
+        description: Timestamp of the earliest first-response across linked support tickets
 
-      - name: ticket_priority
-        description: Priority level of the support ticket
+      - name: ticket_first_escalated_at
+        description: Timestamp of the earliest escalation across linked support tickets
 
-      - name: ticket_status
-        description: Current status of the support ticket
+      - name: ticket_resolved_at
+        description: Timestamp of the latest resolution across linked support tickets
 
-      - name: ticket_channel
-        description: Channel through which the support ticket was created
+      - name: ticket_has_escalation
+        description: Indicates whether any linked support ticket was escalated
 
-      - name: created_at
-        description: Timestamp at which the incident was created
-        tests:
-          - not_null
+      - name: has_support_ticket
+        description: Indicates whether the rental has at least one linked support ticket
 
-      - name: updated_at
-        description: Timestamp at which the incident was last updated
+      - name: incident_count
+        description: Number of incidents linked to the rental
 
-      - name: ingestion_timestamp
-        description: Timestamp at which the incident record was ingested into the analytics warehouse
-        tests:
-          - not_null
+      - name: critical_incident_count
+        description: Number of critical-severity incidents linked to the rental
+
+      - name: incidents_with_police_report_filed
+        description: Number of linked incidents with a police report filed
+
+      - name: incident_estimated_cost
+        description: Total estimated cost across incidents linked to the rental
+
+      - name: first_incident_reported_at
+        description: Timestamp of the earliest incident linked to the rental
+
+      - name: last_incident_reported_at
+        description: Timestamp of the latest incident linked to the rental
+
+      - name: has_incident
+        description: Indicates whether the rental has at least one linked incident

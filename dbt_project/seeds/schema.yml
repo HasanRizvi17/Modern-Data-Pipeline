@@ -1,0 +1,21 @@
+version: 2
+
+seeds:
+  - name: support_ticket_sla_targets
+    description: >
+      Maps support ticket priority to its target resolution time in hours.
+      Drives the resolved_within_sla flag on drive_support_tickets_fct.
+
+    columns:
+      - name: priority
+        description: "{{ doc('support_ticket_priority') }}"
+        tests:
+          - not_null
+          - unique
+          - accepted_values:
+              values: ['low', 'medium', 'high', 'critical']
+
+      - name: target_hours
+        description: Target resolution time in hours for tickets of this priority.
+        tests:
+          - not_null

@@ -91,6 +91,9 @@ models:
       - name: user_market_id
         description: Market identifier associated with the user at rental time.
 
+      - name: user_email
+        description: Email address of the user at rental time.
+
       - name: user_status
         description: "{{ doc('user_status') }}"
 
@@ -102,6 +105,9 @@ models:
 
       - name: user_market
         description: Market name associated with the user.
+
+      - name: user_iso_code
+        description: ISO alpha-2 country code associated with the user.
 
       - name: user_tenure_days
         description: Number of days since user signup at rental time.
@@ -214,7 +220,7 @@ models:
       - name: has_refund
         description: Indicates whether the rental has any refund.
 
-      - name: used_promotion
+      - name: has_promotion
         description: Indicates whether a promotion was used on the rental.
 
       - name: avg_rating_value
@@ -315,6 +321,12 @@ models:
               to: ref('drive_users_dim')
               field: user_id
 
+      - name: user_city_id
+        description: Identifier of the home city of the user who created the support ticket.
+
+      - name: user_city
+        description: Home city name of the user who created the support ticket (distinct from any rental's start/end city).
+
       - name: is_linked_to_rental
         description: Indicates whether the ticket is linked to a rental.
         tests:
@@ -368,8 +380,11 @@ models:
       - name: resolution_time_hours
         description: Time in hours between ticket creation and resolution.
 
-      - name: resolved_within_24hrs
-        description: Indicates whether the ticket was resolved within 24 hours of creation.
+      - name: sla_target_hours
+        description: Target resolution time in hours for the ticket's priority, per support_ticket_sla_targets.
+
+      - name: resolved_within_sla
+        description: Indicates whether the ticket was resolved within its priority's SLA target (see sla_target_hours).
 
       - name: ticket_created_at
         description: Timestamp when the support ticket was created.
@@ -413,7 +428,7 @@ models:
               to: ref('drive_vehicles_dim')
               field: vehicle_id
 
-      - name: customer_id
+      - name: user_id
         description: Identifier of the user involved in the incident.
         tests:
           - not_null
@@ -534,9 +549,10 @@ models:
 
   - name: drive_users_daily_metrics_fct
     description: >
-      Daily aggregated fact table at user-day grain (one row per user per date).
-      Provides daily rental activity, revenue, usage, customer experience,
-      support, and incident metrics derived from rental-level facts.
+      Daily aggregated fact table at user-day grain (one row per user per date
+      with at least one completed rental). Provides daily rental activity,
+      revenue, usage, customer experience, support, and incident metrics
+      derived from rental-level facts.
 
     tests:
       - dbt_utils.unique_combination_of_columns:
@@ -632,3 +648,136 @@ models:
 
       - name: rentals_with_incident
         description: Number of rentals that had at least one incident on the date.
+
+
+  - name: drive_vehicles_daily_metrics_fct
+    description: >
+      Daily aggregated fact table at vehicle-day grain (one row per vehicle per
+      date with at least one completed rental). Provides daily utilization,
+      revenue, and incident/support metrics derived from rental-level facts.
+
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - vehicle_id
+            - date
+
+    columns:
+      - name: vehicle_id
+        description: Unique identifier of the vehicle.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('drive_vehicles_dim')
+              field: vehicle_id
+
+      - name: date
+        description: Calendar date of the aggregated metrics.
+        tests:
+          - not_null
+
+      - name: model_id
+        description: Vehicle model identifier on the given day.
+
+      - name: fleet_id
+        description: Fleet identifier to which the vehicle belongs on the given day.
+
+      - name: vehicle_city
+        description: City where the vehicle is assigned on the given day.
+
+      - name: model_name
+        description: Vehicle model name on the given day.
+
+      - name: brand
+        description: Vehicle brand on the given day.
+
+      - name: energy_type
+        description: Energy type of the vehicle on the given day.
+
+      - name: vehicle_segment
+        description: "{{ doc('vehicle_model_segment') }}"
+
+      - name: vehicle_seats
+        description: Number of seats in the vehicle on the given day.
+
+      - name: fleet_name
+        description: Name of the fleet the vehicle belongs to on the given day.
+
+      - name: company_type
+        description: "{{ doc('vehicle_fleet_company_type') }}"
+
+      - name: rentals_count
+        description: Number of distinct rentals completed by the vehicle on the date.
+
+      - name: total_rental_duration_min
+        description: Total rental duration in minutes for the vehicle on the date.
+
+      - name: total_rental_duration_hour
+        description: Total rental duration in hours for the vehicle on the date.
+
+      - name: total_distance_km
+        description: Total distance traveled by the vehicle on the date in kilometers.
+
+      - name: gross_revenue
+        description: Total gross revenue generated by the vehicle on the date, in EUR.
+
+      - name: net_revenue
+        description: Total net revenue generated by the vehicle on the date, in EUR.
+
+      - name: incident_count
+        description: Total number of incidents associated with the vehicle's rentals on the date.
+
+      - name: critical_incident_count
+        description: Total number of critical incidents associated with the vehicle's rentals on the date.
+
+      - name: ticket_count
+        description: Total number of support tickets associated with the vehicle's rentals on the date.
+
+
+  - name: drive_promotions_daily_metrics_fct
+    description: >
+      Daily aggregated fact table at promo-day grain (one row per promo per
+      date with at least one redemption or completed rental). Provides
+      redemption-rate, repeat-usage, and rental revenue/discount metrics
+      derived from drive_user_promotion_stg and rental-level facts.
+
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - promo_id
+            - date
+
+    columns:
+      - name: promo_id
+        description: Unique identifier of the promotion.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('drive_promotions_dim')
+              field: promo_id
+
+      - name: date
+        description: Calendar date of the aggregated metrics.
+        tests:
+          - not_null
+
+      - name: rentals_count
+        description: Number of distinct rentals that used the promo on the date.
+
+      - name: rental_revenue
+        description: Total rental revenue (rental cost) for rentals that used the promo on the date, in EUR.
+
+      - name: discount_amount
+        description: Total discount amount granted via the promo on the date, in EUR.
+
+      - name: redemptions
+        description: >
+          Number of actual redemption events recorded for the promo on the date, from
+          drive_user_promotion_stg where redeemed_at is populated. Promotions assigned
+          to a user but not yet redeemed (redeemed_at IS NULL) are excluded.
+
+      - name: unique_users_redeemed
+        description: Number of distinct users who redeemed the promo on the date.
+
+      - name: repeat_redemptions
+        description: Number of redemption events on the date that were not the redeeming user's first redemption of this promo.

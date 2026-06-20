@@ -33,10 +33,13 @@ type_casting AS (
 
 standardization AS (
     SELECT
+        -- IDs
         refund_id,
         payment_id,
+        -- attributes
         COALESCE(amount, 0) AS amount,
         {{ standardize_string('reason') }} AS reason,
+        -- timestamps
         created_at,
         ingestion_timestamp
     FROM type_casting

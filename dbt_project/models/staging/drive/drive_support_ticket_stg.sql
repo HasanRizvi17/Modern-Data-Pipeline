@@ -50,20 +50,23 @@ type_casting AS (
 
 standardization AS (
     SELECT
+        -- IDs
         ticket_id,
         user_id,
         rental_id,
         incident_id,
         vehicle_id,
+        -- attributes
         {{ standardize_string('category') }} AS category,
         {{ standardize_string('subject') }} AS subject,
         {{ standardize_string('description') }} AS description,
         {{ standardize_string('priority') }} AS priority,
         {{ standardize_string('status') }} AS status,
         {{ standardize_string('channel') }} AS channel,
+        COALESCE(satisfaction_rating, 0) AS satisfaction_rating,
+        -- timestamps
         created_at,
         updated_at,
-        COALESCE(satisfaction_rating, 0) AS satisfaction_rating,
         ingestion_timestamp
     FROM type_casting
 )

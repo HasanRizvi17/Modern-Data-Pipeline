@@ -40,13 +40,16 @@ type_casting AS (
 
 standardization AS (
     SELECT
+        -- IDs
         vehicle_id,
         city_id,
         model_id,
         fleet_id,
+        -- attributes
         {{ standardize_string('status') }} AS status,
         COALESCE(battery_level, 0) AS battery_level,
         COALESCE(fuel_level, 0) AS fuel_level,
+        -- timestamps
         created_at,
         updated_at,
         ingestion_timestamp

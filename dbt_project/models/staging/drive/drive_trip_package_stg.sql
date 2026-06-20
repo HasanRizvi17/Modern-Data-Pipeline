@@ -31,8 +31,11 @@ type_casting AS (
 
 standardization AS (
     SELECT
+        -- IDs
         package_id,
+        -- attributes
         {{ standardize_string('package_name') }} AS package_name,
+        -- timestamps
         active_from,
         active_to,
         created_at,
