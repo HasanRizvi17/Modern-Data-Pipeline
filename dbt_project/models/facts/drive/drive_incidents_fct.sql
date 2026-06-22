@@ -1,6 +1,4 @@
-{{ config(materialized='view') }}
-
-WITH 
+WITH
 
 incidents AS (
     SELECT *
