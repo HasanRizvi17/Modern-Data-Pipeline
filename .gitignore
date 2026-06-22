@@ -29,6 +29,8 @@ venv/                      # Virtual environment folder
 
 # Other
 documentation/
+OUTPUTS/
+.claude/
 .obsidian/
 dbt_project/.obsidian/
 
