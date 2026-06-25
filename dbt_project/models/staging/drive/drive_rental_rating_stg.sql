@@ -27,7 +27,7 @@ type_casting AS (
         SAFE_CAST(score AS INT64) AS score,
         SAFE_CAST(comment AS STRING) AS comment,
         {{ cast_iso_datetimes(['created_at']) }},
-        DATETIME(TIMESTAMP(ingestion_timestamp), "Europe/Berlin") AS ingestion_timestamp
+        {{ cast_ingestion_timestamp('ingestion_timestamp') }} AS ingestion_timestamp
     FROM extraction
 ),
 

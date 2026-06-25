@@ -45,7 +45,7 @@ type_casting AS (
         SAFE_CAST(status AS STRING) AS status,
         SAFE_CAST(police_report_filed AS BOOL) AS police_report_filed,
         {{ cast_iso_datetimes(['reported_at', 'incident_time', 'resolved_at', 'created_at', 'updated_at']) }},
-        DATETIME(TIMESTAMP(ingestion_timestamp), "Europe/Berlin") AS ingestion_timestamp
+        {{ cast_ingestion_timestamp('ingestion_timestamp') }} AS ingestion_timestamp
     FROM extraction
 ),
 

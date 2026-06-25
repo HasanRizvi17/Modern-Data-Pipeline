@@ -28,7 +28,7 @@ keys/
 venv/                      # Virtual environment folder
 
 # Other
-documentation/
+planning/
 OUTPUTS/
 .claude/
 .obsidian/

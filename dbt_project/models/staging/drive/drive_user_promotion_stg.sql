@@ -24,7 +24,7 @@ type_casting AS (
         SAFE_CAST(user_id AS STRING) AS user_id,
         SAFE_CAST(promo_id AS STRING) AS promo_id,
         {{ cast_iso_datetimes(['redeemed_at', 'created_at']) }},
-        DATETIME(TIMESTAMP(ingestion_timestamp), "Europe/Berlin") AS ingestion_timestamp
+        {{ cast_ingestion_timestamp('ingestion_timestamp') }} AS ingestion_timestamp
     FROM extraction
 ),
 

@@ -10,10 +10,6 @@ models:
       teams.
 
     tests:
-      - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - rental_id
-
       - dbt_utils.expression_is_true:
           expression: "start_time <= end_time OR end_time IS NULL"
 

@@ -31,7 +31,7 @@ type_casting AS (
         SAFE_CAST(start_date AS DATE) AS start_date,
         SAFE_CAST(end_date AS DATE) AS end_date,
         {{ cast_iso_datetimes(['created_at']) }},
-        DATETIME(TIMESTAMP(ingestion_timestamp), "Europe/Berlin") AS ingestion_timestamp
+        {{ cast_ingestion_timestamp('ingestion_timestamp') }} AS ingestion_timestamp
     FROM extraction
 ),
 

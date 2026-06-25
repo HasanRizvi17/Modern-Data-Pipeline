@@ -33,7 +33,7 @@ type_casting AS (
         SAFE_CAST(method AS STRING) AS method,
         SAFE_CAST(currency AS STRING) AS currency,
         {{ cast_iso_datetimes(['created_at']) }},
-        DATETIME(TIMESTAMP(ingestion_timestamp), "Europe/Berlin") AS ingestion_timestamp
+        {{ cast_ingestion_timestamp('ingestion_timestamp') }} AS ingestion_timestamp
     FROM extraction
 ),
 

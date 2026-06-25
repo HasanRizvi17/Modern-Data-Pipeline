@@ -27,7 +27,7 @@ type_casting AS (
         SAFE_CAST(amount AS FLOAT64) AS amount,
         SAFE_CAST(reason AS STRING) AS reason,
         {{ cast_iso_datetimes(['created_at']) }},
-        DATETIME(TIMESTAMP(ingestion_timestamp), "Europe/Berlin") AS ingestion_timestamp
+        {{ cast_ingestion_timestamp('ingestion_timestamp') }} AS ingestion_timestamp
     FROM extraction
 ),
 

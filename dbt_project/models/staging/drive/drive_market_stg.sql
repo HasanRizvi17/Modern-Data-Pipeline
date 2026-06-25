@@ -24,7 +24,7 @@ type_casting AS (
         SAFE_CAST(market_id AS STRING) AS market_id,
         SAFE_CAST(market_name AS STRING) AS market_name,
         {{ cast_iso_datetimes(['created_at', 'updated_at']) }},
-        DATETIME(TIMESTAMP(ingestion_timestamp), "Europe/Berlin") AS ingestion_timestamp
+        {{ cast_ingestion_timestamp('ingestion_timestamp') }} AS ingestion_timestamp
     FROM extraction
 ),
 

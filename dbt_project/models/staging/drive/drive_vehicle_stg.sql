@@ -34,7 +34,7 @@ type_casting AS (
         SAFE_CAST(battery_level AS INT64) AS battery_level,
         SAFE_CAST(fuel_level AS INT64) AS fuel_level,
         {{ cast_iso_datetimes(['created_at', 'updated_at']) }},
-        DATETIME(TIMESTAMP(ingestion_timestamp), "Europe/Berlin") AS ingestion_timestamp
+        {{ cast_ingestion_timestamp('ingestion_timestamp') }} AS ingestion_timestamp
     FROM extraction
 ),
 

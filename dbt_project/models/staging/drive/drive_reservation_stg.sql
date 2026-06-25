@@ -40,7 +40,7 @@ type_casting AS (
         SAFE_CAST(status AS STRING) AS status,
         SAFE_CAST(cancellation_reason AS STRING) AS cancellation_reason,
         {{ cast_iso_datetimes(['reserved_at', 'reservation_start_at', 'reservation_end_at', 'cancelled_at', 'created_at', 'updated_at']) }},
-        DATETIME(TIMESTAMP(ingestion_timestamp), "Europe/Berlin") AS ingestion_timestamp
+        {{ cast_ingestion_timestamp('ingestion_timestamp') }} AS ingestion_timestamp
     FROM extraction
 ),
 
