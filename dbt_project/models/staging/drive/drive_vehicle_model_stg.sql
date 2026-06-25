@@ -31,7 +31,7 @@ type_casting AS (
         SAFE_CAST(segment AS STRING) AS segment,
         SAFE_CAST(seats AS INT64) AS seats,
         {{ cast_iso_datetimes(['created_at']) }},
-        DATETIME(TIMESTAMP(ingestion_timestamp), "Europe/Berlin") AS ingestion_timestamp
+        {{ cast_ingestion_timestamp('ingestion_timestamp') }} AS ingestion_timestamp
     FROM extraction
 ),
 

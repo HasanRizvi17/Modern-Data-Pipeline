@@ -44,7 +44,7 @@ type_casting AS (
         SAFE_CAST(channel AS STRING) AS channel,
         SAFE_CAST(satisfaction_rating AS INT64) AS satisfaction_rating,
         {{ cast_iso_datetimes(['created_at', 'updated_at']) }},
-        DATETIME(TIMESTAMP(ingestion_timestamp), "Europe/Berlin") AS ingestion_timestamp
+        {{ cast_ingestion_timestamp('ingestion_timestamp') }} AS ingestion_timestamp
     FROM extraction
 ),
 

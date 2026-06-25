@@ -31,7 +31,7 @@ type_casting AS (
         SAFE_CAST(old_value AS STRING) AS old_value,
         SAFE_CAST(new_value AS STRING) AS new_value,
         {{ cast_iso_datetimes(['changed_at']) }},
-        DATETIME(TIMESTAMP(ingestion_timestamp), "Europe/Berlin") AS ingestion_timestamp
+        {{ cast_ingestion_timestamp('ingestion_timestamp') }} AS ingestion_timestamp
     FROM extraction
 ),
 

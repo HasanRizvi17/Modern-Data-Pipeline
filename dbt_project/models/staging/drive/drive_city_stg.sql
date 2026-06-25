@@ -28,7 +28,7 @@ type_casting AS (
         SAFE_CAST(city_name AS STRING) AS city_name,
         SAFE_CAST(timezone AS STRING) AS timezone,
         {{ cast_iso_datetimes(['created_at', 'updated_at']) }},
-        DATETIME(TIMESTAMP(ingestion_timestamp), "Europe/Berlin") AS ingestion_timestamp
+        {{ cast_ingestion_timestamp('ingestion_timestamp') }} AS ingestion_timestamp
     FROM extraction
 ),
 

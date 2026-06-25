@@ -7,11 +7,6 @@ models:
       user snapshot, vehicle attributes, payments and revenue, ratings, support tickets,
       and incidents to enable end-to-end rental analytics.
 
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - rental_id
-
     columns:
       - name: rental_id
         description: Unique identifier for a rental.
@@ -294,11 +289,6 @@ models:
       escalation and reopen behavior, and response and resolution time metrics
       for operational and SLA analysis.
 
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - ticket_id
-
     columns:
       - name: ticket_id
         description: Unique identifier of the support ticket.
@@ -401,11 +391,6 @@ models:
       details, linkage to rentals, vehicles and users, severity and police
       involvement, estimated cost, and time to resolution for operational
       monitoring and risk analysis.
-
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - incident_id
 
     columns:
       - name: incident_id

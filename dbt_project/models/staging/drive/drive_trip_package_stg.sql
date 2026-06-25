@@ -25,7 +25,7 @@ type_casting AS (
         SAFE_CAST(package_id AS STRING) AS package_id,
         SAFE_CAST(package_name AS STRING) AS package_name,
         {{ cast_iso_datetimes(['active_from', 'active_to', 'created_at']) }},
-        DATETIME(TIMESTAMP(ingestion_timestamp), "Europe/Berlin") AS ingestion_timestamp
+        {{ cast_ingestion_timestamp('ingestion_timestamp') }} AS ingestion_timestamp
     FROM extraction
 ),
 

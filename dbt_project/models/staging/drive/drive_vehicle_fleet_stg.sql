@@ -27,7 +27,7 @@ type_casting AS (
         SAFE_CAST(company_type AS STRING) AS company_type,
         SAFE_CAST(city_id AS STRING) AS city_id,
         {{ cast_iso_datetimes(['created_at']) }},
-        DATETIME(TIMESTAMP(ingestion_timestamp), "Europe/Berlin") AS ingestion_timestamp
+        {{ cast_ingestion_timestamp('ingestion_timestamp') }} AS ingestion_timestamp
     FROM extraction
 ),
 
