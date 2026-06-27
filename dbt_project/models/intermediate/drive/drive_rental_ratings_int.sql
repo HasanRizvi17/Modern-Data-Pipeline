@@ -19,7 +19,7 @@ ratings_data AS (
         rr.comment,
         rr.created_at,
         r.end_time AS rental_end_at,
-        TIMESTAMP_DIFF(rr.created_at, r.end_time, HOUR) AS rating_delay_hours
+        {{ dbt.datediff('r.end_time', 'rr.created_at', 'hour') }} AS rating_delay_hours
     FROM rental_ratings AS rr
     LEFT JOIN rentals AS r ON rr.rental_id = r.rental_id
 ),

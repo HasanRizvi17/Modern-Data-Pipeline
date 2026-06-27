@@ -1,10 +1,13 @@
+{% set raw_source = source('drive_raw', 'drive_reservation_raw') %}
+
 WITH
 
 raw AS (
     SELECT
         timestamp,
         data
-    FROM {{ source('drive_raw', 'drive_reservation_raw') }}
+    FROM {{ raw_source }}
+    {{ limit_data_in_dev('timestamp', raw_source) }}
 ),
 
 extraction AS (
@@ -31,14 +34,14 @@ extraction AS (
 
 type_casting AS (
     SELECT
-        SAFE_CAST(reservation_id AS STRING) AS reservation_id,
-        SAFE_CAST(user_id AS STRING) AS user_id,
-        SAFE_CAST(vehicle_id AS STRING) AS vehicle_id,
-        SAFE_CAST(city_id AS STRING) AS city_id,
-        SAFE_CAST(package_id AS STRING) AS package_id,
-        SAFE_CAST(rental_id AS STRING) AS rental_id,
-        SAFE_CAST(status AS STRING) AS status,
-        SAFE_CAST(cancellation_reason AS STRING) AS cancellation_reason,
+        {{ dbt.safe_cast('reservation_id', dbt.type_string()) }} AS reservation_id,
+        {{ dbt.safe_cast('user_id', dbt.type_string()) }} AS user_id,
+        {{ dbt.safe_cast('vehicle_id', dbt.type_string()) }} AS vehicle_id,
+        {{ dbt.safe_cast('city_id', dbt.type_string()) }} AS city_id,
+        {{ dbt.safe_cast('package_id', dbt.type_string()) }} AS package_id,
+        {{ dbt.safe_cast('rental_id', dbt.type_string()) }} AS rental_id,
+        {{ dbt.safe_cast('status', dbt.type_string()) }} AS status,
+        {{ dbt.safe_cast('cancellation_reason', dbt.type_string()) }} AS cancellation_reason,
         {{ cast_iso_datetimes(['reserved_at', 'reservation_start_at', 'reservation_end_at', 'cancelled_at', 'created_at', 'updated_at']) }},
         {{ cast_ingestion_timestamp('ingestion_timestamp') }} AS ingestion_timestamp
     FROM extraction

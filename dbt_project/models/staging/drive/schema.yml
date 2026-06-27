@@ -806,6 +806,8 @@ models:
           - relationships:
               to: ref('drive_payment_stg')
               field: payment_id
+              config:
+                severity: warn
 
       - name: amount
         description: Monetary amount associated with the transaction
@@ -934,6 +936,8 @@ models:
           - relationships:
               to: ref('drive_rental_stg')
               field: rental_id
+              config:
+                severity: warn
 
       - name: incident_id
         description: Unique identifier of the incident
@@ -941,6 +945,8 @@ models:
           - relationships:
               to: ref('drive_incident_stg')
               field: incident_id
+              config:
+                severity: warn
 
       - name: vehicle_id
         description: Unique identifier of the vehicle

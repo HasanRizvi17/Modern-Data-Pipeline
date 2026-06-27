@@ -22,10 +22,10 @@ extraction AS (
 
 type_casting AS (
     SELECT
-        SAFE_CAST(fleet_id AS STRING) AS fleet_id,
-        SAFE_CAST(fleet_name AS STRING) AS fleet_name,
-        SAFE_CAST(company_type AS STRING) AS company_type,
-        SAFE_CAST(city_id AS STRING) AS city_id,
+        {{ dbt.safe_cast('fleet_id', dbt.type_string()) }} AS fleet_id,
+        {{ dbt.safe_cast('fleet_name', dbt.type_string()) }} AS fleet_name,
+        {{ dbt.safe_cast('company_type', dbt.type_string()) }} AS company_type,
+        {{ dbt.safe_cast('city_id', dbt.type_string()) }} AS city_id,
         {{ cast_iso_datetimes(['created_at']) }},
         {{ cast_ingestion_timestamp('ingestion_timestamp') }} AS ingestion_timestamp
     FROM extraction

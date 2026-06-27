@@ -1,10 +1,13 @@
+{% set raw_source = source('drive_raw', 'drive_rental_rating_raw') %}
+
 WITH
 
 raw AS (
     SELECT
         timestamp,
         data
-    FROM {{ source('drive_raw', 'drive_rental_rating_raw') }}
+    FROM {{ raw_source }}
+    {{ limit_data_in_dev('timestamp', raw_source) }}
 ),
 
 extraction AS (
@@ -22,10 +25,10 @@ extraction AS (
 
 type_casting AS (
     SELECT
-        SAFE_CAST(rating_id AS STRING) AS rating_id,
-        SAFE_CAST(rental_id AS STRING) AS rental_id,
-        SAFE_CAST(score AS INT64) AS score,
-        SAFE_CAST(comment AS STRING) AS comment,
+        {{ dbt.safe_cast('rating_id', dbt.type_string()) }} AS rating_id,
+        {{ dbt.safe_cast('rental_id', dbt.type_string()) }} AS rental_id,
+        {{ dbt.safe_cast('score', dbt.type_bigint()) }} AS score,
+        {{ dbt.safe_cast('comment', dbt.type_string()) }} AS comment,
         {{ cast_iso_datetimes(['created_at']) }},
         {{ cast_ingestion_timestamp('ingestion_timestamp') }} AS ingestion_timestamp
     FROM extraction

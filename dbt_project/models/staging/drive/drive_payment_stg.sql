@@ -1,10 +1,13 @@
+{% set raw_source = source('drive_raw', 'drive_payment_raw') %}
+
 WITH
 
 raw AS (
     SELECT
         timestamp,
         data
-    FROM {{ source('drive_raw', 'drive_payment_raw') }}
+    FROM {{ raw_source }}
+    {{ limit_data_in_dev('timestamp', raw_source) }}
 ),
 
 extraction AS (
@@ -25,13 +28,13 @@ extraction AS (
 
 type_casting AS (
     SELECT
-        SAFE_CAST(payment_id AS STRING) AS payment_id,
-        SAFE_CAST(rental_id AS STRING) AS rental_id,
-        SAFE_CAST(user_id AS STRING) AS user_id,
-        SAFE_CAST(amount AS FLOAT64) AS amount,
-        SAFE_CAST(status AS STRING) AS status,
-        SAFE_CAST(method AS STRING) AS method,
-        SAFE_CAST(currency AS STRING) AS currency,
+        {{ dbt.safe_cast('payment_id', dbt.type_string()) }} AS payment_id,
+        {{ dbt.safe_cast('rental_id', dbt.type_string()) }} AS rental_id,
+        {{ dbt.safe_cast('user_id', dbt.type_string()) }} AS user_id,
+        {{ dbt.safe_cast('amount', dbt.type_float()) }} AS amount,
+        {{ dbt.safe_cast('status', dbt.type_string()) }} AS status,
+        {{ dbt.safe_cast('method', dbt.type_string()) }} AS method,
+        {{ dbt.safe_cast('currency', dbt.type_string()) }} AS currency,
         {{ cast_iso_datetimes(['created_at']) }},
         {{ cast_ingestion_timestamp('ingestion_timestamp') }} AS ingestion_timestamp
     FROM extraction

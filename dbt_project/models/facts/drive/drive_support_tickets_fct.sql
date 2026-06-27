@@ -12,14 +12,14 @@ sla_targets AS (
 
 SELECT
     t.* EXCEPT(ticket_created_at, ticket_updated_at, ticket_has_escalation),
-    TIMESTAMP_DIFF(first_response_at, ticket_created_at, MINUTE) AS first_response_time_minutes,
-    TIMESTAMP_DIFF(first_response_at, ticket_created_at, HOUR) AS first_response_time_hours,
-    TIMESTAMP_DIFF(resolved_at, ticket_created_at, MINUTE) AS resolution_time_minutes,
-    TIMESTAMP_DIFF(resolved_at, ticket_created_at, HOUR) AS resolution_time_hours,
+    {{ dbt.datediff('ticket_created_at', 'first_response_at', 'minute') }} AS first_response_time_minutes,
+    {{ dbt.datediff('ticket_created_at', 'first_response_at', 'hour') }} AS first_response_time_hours,
+    {{ dbt.datediff('ticket_created_at', 'resolved_at', 'minute') }} AS resolution_time_minutes,
+    {{ dbt.datediff('ticket_created_at', 'resolved_at', 'hour') }} AS resolution_time_hours,
     sla.target_hours AS sla_target_hours,
     CASE
         WHEN resolved_at IS NULL THEN FALSE
-        WHEN TIMESTAMP_DIFF(resolved_at, ticket_created_at, HOUR) <= sla.target_hours THEN TRUE
+        WHEN {{ dbt.datediff('ticket_created_at', 'resolved_at', 'hour') }} <= sla.target_hours THEN TRUE
         ELSE FALSE
     END AS resolved_within_sla,
     ticket_created_at,

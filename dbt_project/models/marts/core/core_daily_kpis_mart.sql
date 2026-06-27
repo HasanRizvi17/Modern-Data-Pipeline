@@ -68,12 +68,12 @@ SELECT
     (
         SELECT COUNT(DISTINCT user_id)
         FROM users_daily AS u
-        WHERE u.date BETWEEN DATE_SUB(dk.date, INTERVAL 6 DAY) AND dk.date
+        WHERE u.date BETWEEN {{ dbt.dateadd('day', -6, 'dk.date') }} AND dk.date
     ) AS rolling_7d_active_users,
     (
         SELECT COUNT(DISTINCT user_id)
         FROM users_daily AS u
-        WHERE u.date BETWEEN DATE_SUB(dk.date, INTERVAL 27 DAY) AND dk.date
+        WHERE u.date BETWEEN {{ dbt.dateadd('day', -27, 'dk.date') }} AND dk.date
     ) AS rolling_28d_active_users,
 
     CURRENT_TIMESTAMP() AS loaded_at

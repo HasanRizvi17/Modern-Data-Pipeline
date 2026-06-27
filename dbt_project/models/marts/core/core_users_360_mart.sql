@@ -25,9 +25,12 @@ rolling_30d AS (
         COALESCE(SUM(rentals_count), 0) AS rolling_30d_rentals,
         COALESCE(SUM(net_revenue), 0) AS rolling_30d_net_revenue
     FROM users_daily_metrics
-    WHERE date >= DATE_SUB(CURRENT_DATE(), INTERVAL 29 DAY)
+    WHERE date >= {{ dbt.dateadd('day', -29, 'CURRENT_DATE()') }}
     GROUP BY user_id
 )
+
+{% set week_trunc = dbt.date_trunc('week', 'date') %}
+{% set month_trunc = dbt.date_trunc('month', 'date') %}
 
 SELECT
     -- grain
@@ -39,29 +42,29 @@ SELECT
     u.user_tenure_days_group,
 
     -- activity
-    COALESCE(COUNT(DISTINCT DATE_TRUNC(date, DAY)), 0) AS active_days,
-    COALESCE(COUNT(DISTINCT DATE_TRUNC(date, WEEK)), 0) AS active_weeks,
-    COALESCE(COUNT(DISTINCT DATE_TRUNC(date, MONTH)), 0) AS active_months,
-    COALESCE(COUNT(DISTINCT DATE_TRUNC(date, QUARTER)), 0) AS active_quarters,
-    COALESCE(COUNT(DISTINCT DATE_TRUNC(date, YEAR)), 0) AS active_years,
+    COALESCE(COUNT(DISTINCT {{ dbt.date_trunc('day', 'date') }}), 0) AS active_days,
+    COALESCE(COUNT(DISTINCT {{ week_trunc }}), 0) AS active_weeks,
+    COALESCE(COUNT(DISTINCT {{ month_trunc }}), 0) AS active_months,
+    COALESCE(COUNT(DISTINCT {{ dbt.date_trunc('quarter', 'date') }}), 0) AS active_quarters,
+    COALESCE(COUNT(DISTINCT {{ dbt.date_trunc('year', 'date') }}), 0) AS active_years,
     -- activity_rate_days: percentage of days active since between first and last rental date
     ROUND(SAFE_DIVIDE(
-        COUNT(DISTINCT DATE_TRUNC(date, DAY)),
-        DATE_DIFF(MAX(date), MIN(date), DAY) + 1
+        COUNT(DISTINCT {{ dbt.date_trunc('day', 'date') }}),
+        {{ dbt.datediff('MIN(date)', 'MAX(date)', 'day') }} + 1
     ), 4) AS activity_rate_days,
     -- activity_rate_weeks: percentage of days active since between first and last rental date
     ROUND(SAFE_DIVIDE(
-        COUNT(DISTINCT DATE_TRUNC(date, WEEK)),
-        DATE_DIFF(MAX(DATE_TRUNC(date, WEEK)), MIN(DATE_TRUNC(date, WEEK)), WEEK) + 1
+        COUNT(DISTINCT {{ week_trunc }}),
+        {{ dbt.datediff('MIN(' ~ week_trunc ~ ')', 'MAX(' ~ week_trunc ~ ')', 'week') }} + 1
     ), 4) AS activity_rate_weeks,
     -- activity_rate_months: percentage of days active since between first and last rental date
     ROUND(SAFE_DIVIDE(
-        COUNT(DISTINCT DATE_TRUNC(date, MONTH)),
-        DATE_DIFF(MAX(DATE_TRUNC(date, MONTH)), MIN(DATE_TRUNC(date, MONTH)), MONTH) + 1
+        COUNT(DISTINCT {{ month_trunc }}),
+        {{ dbt.datediff('MIN(' ~ month_trunc ~ ')', 'MAX(' ~ month_trunc ~ ')', 'month') }} + 1
     ), 4) AS activity_rate_months,
     MIN(date) AS first_rental_date,
     MAX(date) AS last_rental_date,
-    DATE_DIFF(CURRENT_DATE(), MAX(date), DAY) AS recency_days,
+    {{ dbt.datediff('MAX(date)', 'CURRENT_DATE()', 'day') }} AS recency_days,
 
     -- rental metrics
     COALESCE(SUM(rentals_count), 0) AS total_rentals,

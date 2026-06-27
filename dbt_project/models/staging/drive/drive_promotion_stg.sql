@@ -24,12 +24,12 @@ extraction AS (
 
 type_casting AS (
     SELECT
-        SAFE_CAST(promo_id AS STRING) AS promo_id,
-        SAFE_CAST(promo_code AS STRING) AS promo_code,
-        SAFE_CAST(discount_amount AS FLOAT64) AS discount_amount,
-        SAFE_CAST(discount_type AS STRING) AS discount_type,
-        SAFE_CAST(start_date AS DATE) AS start_date,
-        SAFE_CAST(end_date AS DATE) AS end_date,
+        {{ dbt.safe_cast('promo_id', dbt.type_string()) }} AS promo_id,
+        {{ dbt.safe_cast('promo_code', dbt.type_string()) }} AS promo_code,
+        {{ dbt.safe_cast('discount_amount', dbt.type_float()) }} AS discount_amount,
+        {{ dbt.safe_cast('discount_type', dbt.type_string()) }} AS discount_type,
+        {{ dbt.safe_cast('start_date', 'date') }} AS start_date,
+        {{ dbt.safe_cast('end_date', 'date') }} AS end_date,
         {{ cast_iso_datetimes(['created_at']) }},
         {{ cast_ingestion_timestamp('ingestion_timestamp') }} AS ingestion_timestamp
     FROM extraction

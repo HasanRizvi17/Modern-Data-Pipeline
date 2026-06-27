@@ -26,13 +26,13 @@ extraction AS (
 
 type_casting AS (
     SELECT
-        SAFE_CAST(vehicle_id AS STRING) AS vehicle_id,
-        SAFE_CAST(city_id AS STRING) AS city_id,
-        SAFE_CAST(model_id AS STRING) AS model_id,
-        SAFE_CAST(fleet_id AS STRING) AS fleet_id,
-        SAFE_CAST(status AS STRING) AS status,
-        SAFE_CAST(battery_level AS INT64) AS battery_level,
-        SAFE_CAST(fuel_level AS INT64) AS fuel_level,
+        {{ dbt.safe_cast('vehicle_id', dbt.type_string()) }} AS vehicle_id,
+        {{ dbt.safe_cast('city_id', dbt.type_string()) }} AS city_id,
+        {{ dbt.safe_cast('model_id', dbt.type_string()) }} AS model_id,
+        {{ dbt.safe_cast('fleet_id', dbt.type_string()) }} AS fleet_id,
+        {{ dbt.safe_cast('status', dbt.type_string()) }} AS status,
+        {{ dbt.safe_cast('battery_level', dbt.type_bigint()) }} AS battery_level,
+        {{ dbt.safe_cast('fuel_level', dbt.type_bigint()) }} AS fuel_level,
         {{ cast_iso_datetimes(['created_at', 'updated_at']) }},
         {{ cast_ingestion_timestamp('ingestion_timestamp') }} AS ingestion_timestamp
     FROM extraction
