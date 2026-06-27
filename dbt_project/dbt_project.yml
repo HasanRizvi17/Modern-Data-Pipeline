@@ -70,4 +70,4 @@ seeds:
     +schema: drive_seed
 
 tests:
-  +severity: warn  # set default severity for tests to "warn" (options: "error", "warn")
+  +severity: error  # set default severity for tests to "error" (options: "error", "warn")

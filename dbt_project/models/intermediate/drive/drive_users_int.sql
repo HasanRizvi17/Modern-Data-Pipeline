@@ -36,13 +36,13 @@ users_data AS (
         co.iso_code,
         m.market_name AS market,
         -- user tenure
-        DATE_DIFF(CURRENT_DATE, date(u.created_at), DAY) AS user_tenure_days,
+        {{ dbt.datediff('date(u.created_at)', 'CURRENT_DATE()', 'day') }} AS user_tenure_days,
         CASE
-            WHEN DATE_DIFF(CURRENT_DATE, date(u.created_at), DAY) < 30 THEN '< 30 days'
-            WHEN DATE_DIFF(CURRENT_DATE, date(u.created_at), DAY) BETWEEN 30 AND 90 THEN '30-90 days'
-            WHEN DATE_DIFF(CURRENT_DATE, date(u.created_at), DAY) BETWEEN 91 AND 180 THEN '91-180 days'
-            WHEN DATE_DIFF(CURRENT_DATE, date(u.created_at), DAY) BETWEEN 181 AND 365 THEN '> 181-365 days'
-            WHEN DATE_DIFF(CURRENT_DATE, date(u.created_at), DAY) > 365 THEN '> 365 days'
+            WHEN {{ dbt.datediff('date(u.created_at)', 'CURRENT_DATE()', 'day') }} < 30 THEN '< 30 days'
+            WHEN {{ dbt.datediff('date(u.created_at)', 'CURRENT_DATE()', 'day') }} BETWEEN 30 AND 90 THEN '30-90 days'
+            WHEN {{ dbt.datediff('date(u.created_at)', 'CURRENT_DATE()', 'day') }} BETWEEN 91 AND 180 THEN '91-180 days'
+            WHEN {{ dbt.datediff('date(u.created_at)', 'CURRENT_DATE()', 'day') }} BETWEEN 181 AND 365 THEN '> 181-365 days'
+            WHEN {{ dbt.datediff('date(u.created_at)', 'CURRENT_DATE()', 'day') }} > 365 THEN '> 365 days'
         END AS user_tenure_days_group,
         -- user status derived fields 
         CASE

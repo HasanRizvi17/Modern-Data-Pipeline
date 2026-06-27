@@ -1,10 +1,13 @@
+{% set raw_source = source('drive_raw', 'drive_refund_raw') %}
+
 WITH
 
 raw AS (
     SELECT
         timestamp,
         data
-    FROM {{ source('drive_raw', 'drive_refund_raw') }}
+    FROM {{ raw_source }}
+    {{ limit_data_in_dev('timestamp', raw_source) }}
 ),
 
 extraction AS (
@@ -22,10 +25,10 @@ extraction AS (
 
 type_casting AS (
     SELECT
-        SAFE_CAST(refund_id AS STRING) AS refund_id,
-        SAFE_CAST(payment_id AS STRING) AS payment_id,
-        SAFE_CAST(amount AS FLOAT64) AS amount,
-        SAFE_CAST(reason AS STRING) AS reason,
+        {{ dbt.safe_cast('refund_id', dbt.type_string()) }} AS refund_id,
+        {{ dbt.safe_cast('payment_id', dbt.type_string()) }} AS payment_id,
+        {{ dbt.safe_cast('amount', dbt.type_float()) }} AS amount,
+        {{ dbt.safe_cast('reason', dbt.type_string()) }} AS reason,
         {{ cast_iso_datetimes(['created_at']) }},
         {{ cast_ingestion_timestamp('ingestion_timestamp') }} AS ingestion_timestamp
     FROM extraction

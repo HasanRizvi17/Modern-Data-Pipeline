@@ -1,10 +1,13 @@
+{% set raw_source = source('drive_raw', 'drive_user_promotion_raw') %}
+
 WITH
 
 raw AS (
     SELECT
         timestamp,
         data
-    FROM {{ source('drive_raw', 'drive_user_promotion_raw') }}
+    FROM {{ raw_source }}
+    {{ limit_data_in_dev('timestamp', raw_source) }}
 ),
 
 extraction AS (
@@ -21,8 +24,8 @@ extraction AS (
 
 type_casting AS (
     SELECT
-        SAFE_CAST(user_id AS STRING) AS user_id,
-        SAFE_CAST(promo_id AS STRING) AS promo_id,
+        {{ dbt.safe_cast('user_id', dbt.type_string()) }} AS user_id,
+        {{ dbt.safe_cast('promo_id', dbt.type_string()) }} AS promo_id,
         {{ cast_iso_datetimes(['redeemed_at', 'created_at']) }},
         {{ cast_ingestion_timestamp('ingestion_timestamp') }} AS ingestion_timestamp
     FROM extraction

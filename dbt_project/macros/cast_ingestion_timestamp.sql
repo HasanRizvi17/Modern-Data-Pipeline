@@ -1,3 +1,3 @@
 {%- macro cast_ingestion_timestamp(column, timezone='Europe/Berlin') -%}
-DATETIME(TIMESTAMP({{ column }}), "{{ timezone }}")
+cast({{ dbt_date.convert_timezone(column, target_tz=timezone) }} as datetime)
 {%- endmacro -%}

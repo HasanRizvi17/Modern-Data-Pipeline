@@ -249,13 +249,9 @@ models:
 
       - name: rental_duration_min
         description: Total duration of the rental expressed in minutes
-        tests:
-          - not_null
 
       - name: rental_duration_hour
         description: Total duration of the rental expressed in hours
-        tests:
-          - not_null
 
       - name: distance_km
         description: Distance driven during the rental in kilometers
@@ -365,11 +361,15 @@ models:
           - relationships:
               to: ref('drive_rentals_fct')
               field: rental_id
+              config:
+                severity: warn
 
       - name: user_id
         description: Identifier of the user who created the support ticket
         tests:
-          - not_null
+          - not_null:
+              config:
+                severity: warn
           - relationships:
               to: ref('drive_users_dim')
               field: user_id

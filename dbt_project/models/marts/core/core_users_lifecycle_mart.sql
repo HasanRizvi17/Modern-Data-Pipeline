@@ -25,7 +25,7 @@ rfm_inputs AS (
         u.user_market,
         u.user_tenure_days,
         u.user_tenure_days_group,
-        DATE_DIFF(CURRENT_DATE(), MAX(r.date), DAY) AS recency_days,
+        {{ dbt.datediff('MAX(r.date)', 'CURRENT_DATE()', 'day') }} AS recency_days,
         COALESCE(SUM(r.rentals_count), 0) AS frequency_total_rentals,
         COALESCE(SUM(r.net_revenue), 0) AS monetary_lifetime_net_revenue
     FROM users AS u

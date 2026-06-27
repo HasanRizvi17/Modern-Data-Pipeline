@@ -6,7 +6,7 @@ date_spine AS (
     {{ dbt_utils.date_spine(
         datepart = "day",
         start_date = "DATE('2024-07-01')",
-        end_date   = "DATE_ADD(CURRENT_DATE(), INTERVAL 365 DAY)"
+        end_date   = dbt.dateadd('day', 365, 'CURRENT_DATE()')
     ) }}
 )
 
@@ -24,10 +24,10 @@ SELECT
     EXTRACT(ISOYEAR FROM date_day) AS iso_year,
 
     -- period starts
-    DATE(DATE_TRUNC(date_day, WEEK(MONDAY))) AS week_start_date,
-    DATE(DATE_TRUNC(date_day, MONTH)) AS month_start_date,
-    DATE(DATE_TRUNC(date_day, QUARTER)) AS quarter_start_date,
-    DATE(DATE_TRUNC(date_day, YEAR)) AS year_start_date,
+    cast({{ dbt.date_trunc('week', 'date_day') }} as date) AS week_start_date,
+    cast({{ dbt.date_trunc('month', 'date_day') }} as date) AS month_start_date,
+    cast({{ dbt.date_trunc('quarter', 'date_day') }} as date) AS quarter_start_date,
+    cast({{ dbt.date_trunc('year', 'date_day') }} as date) AS year_start_date,
 
     -- labels and flags
     FORMAT_DATE('%A', date_day) AS day_name,

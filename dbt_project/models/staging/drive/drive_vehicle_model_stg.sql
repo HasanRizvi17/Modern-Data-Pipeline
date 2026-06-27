@@ -24,12 +24,12 @@ extraction AS (
 
 type_casting AS (
     SELECT
-        SAFE_CAST(model_id AS STRING) AS model_id,
-        SAFE_CAST(model_name AS STRING) AS model_name,
-        SAFE_CAST(brand AS STRING) AS brand,
-        SAFE_CAST(energy_type AS STRING) AS energy_type,
-        SAFE_CAST(segment AS STRING) AS segment,
-        SAFE_CAST(seats AS INT64) AS seats,
+        {{ dbt.safe_cast('model_id', dbt.type_string()) }} AS model_id,
+        {{ dbt.safe_cast('model_name', dbt.type_string()) }} AS model_name,
+        {{ dbt.safe_cast('brand', dbt.type_string()) }} AS brand,
+        {{ dbt.safe_cast('energy_type', dbt.type_string()) }} AS energy_type,
+        {{ dbt.safe_cast('segment', dbt.type_string()) }} AS segment,
+        {{ dbt.safe_cast('seats', dbt.type_bigint()) }} AS seats,
         {{ cast_iso_datetimes(['created_at']) }},
         {{ cast_ingestion_timestamp('ingestion_timestamp') }} AS ingestion_timestamp
     FROM extraction

@@ -18,7 +18,7 @@ SELECT
     estimated_cost,
     reported_at,
     resolved_at,
-    TIMESTAMP_DIFF(resolved_at, reported_at, HOUR) AS resolution_time_hours,
+    {{ dbt.datediff('reported_at', 'resolved_at', 'hour') }} AS resolution_time_hours,
     created_at,
     DATE(created_at) AS created_date,
     updated_at

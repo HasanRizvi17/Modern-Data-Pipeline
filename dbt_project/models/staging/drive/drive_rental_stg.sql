@@ -1,10 +1,13 @@
+{% set raw_source = source('drive_raw', 'drive_rental_raw') %}
+
 WITH
 
 raw AS (
     SELECT
         timestamp,
         data
-    FROM {{ source('drive_raw', 'drive_rental_raw') }}
+    FROM {{ raw_source }}
+    {{ limit_data_in_dev('timestamp', raw_source) }}
 ),
 
 extraction AS (
@@ -33,18 +36,18 @@ extraction AS (
 
 type_casting AS (
     SELECT
-        SAFE_CAST(rental_id AS STRING) AS rental_id,
-        SAFE_CAST(user_id AS STRING) AS user_id,
-        SAFE_CAST(vehicle_id AS STRING) AS vehicle_id,
-        SAFE_CAST(package_id AS STRING) AS package_id,
-        SAFE_CAST(start_city_id AS STRING) AS start_city_id,
-        SAFE_CAST(end_city_id AS STRING) AS end_city_id,
-        SAFE_CAST(status AS STRING) AS status,
-        SAFE_CAST(distance_km AS FLOAT64) AS distance_km,
-        SAFE_CAST(rental_cost AS FLOAT64) AS rental_cost,
-        SAFE_CAST(promo_id AS STRING) AS promo_id,
-        SAFE_CAST(reservation_id AS STRING) AS reservation_id,
-        SAFE_CAST(incident_id AS STRING) AS incident_id,
+        {{ dbt.safe_cast('rental_id', dbt.type_string()) }} AS rental_id,
+        {{ dbt.safe_cast('user_id', dbt.type_string()) }} AS user_id,
+        {{ dbt.safe_cast('vehicle_id', dbt.type_string()) }} AS vehicle_id,
+        {{ dbt.safe_cast('package_id', dbt.type_string()) }} AS package_id,
+        {{ dbt.safe_cast('start_city_id', dbt.type_string()) }} AS start_city_id,
+        {{ dbt.safe_cast('end_city_id', dbt.type_string()) }} AS end_city_id,
+        {{ dbt.safe_cast('status', dbt.type_string()) }} AS status,
+        {{ dbt.safe_cast('distance_km', dbt.type_float()) }} AS distance_km,
+        {{ dbt.safe_cast('rental_cost', dbt.type_float()) }} AS rental_cost,
+        {{ dbt.safe_cast('promo_id', dbt.type_string()) }} AS promo_id,
+        {{ dbt.safe_cast('reservation_id', dbt.type_string()) }} AS reservation_id,
+        {{ dbt.safe_cast('incident_id', dbt.type_string()) }} AS incident_id,
         {{ cast_iso_datetimes(['start_time', 'end_time', 'created_at', 'updated_at']) }},
         {{ cast_ingestion_timestamp('ingestion_timestamp') }} AS ingestion_timestamp
     FROM extraction

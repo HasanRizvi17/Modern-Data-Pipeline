@@ -1,10 +1,13 @@
+{% set raw_source = source('drive_raw', 'drive_support_ticket_raw') %}
+
 WITH
 
 raw AS (
     SELECT
         timestamp,
         data
-    FROM {{ source('drive_raw', 'drive_support_ticket_raw') }}
+    FROM {{ raw_source }}
+    {{ limit_data_in_dev('timestamp', raw_source) }}
 ),
 
 extraction AS (
@@ -31,18 +34,18 @@ extraction AS (
 
 type_casting AS (
     SELECT
-        SAFE_CAST(ticket_id AS STRING) AS ticket_id,
-        SAFE_CAST(user_id AS STRING) AS user_id,
-        SAFE_CAST(rental_id AS STRING) AS rental_id,
-        SAFE_CAST(incident_id AS STRING) AS incident_id,
-        SAFE_CAST(vehicle_id AS STRING) AS vehicle_id,
-        SAFE_CAST(category AS STRING) AS category,
-        SAFE_CAST(subject AS STRING) AS subject,
-        SAFE_CAST(description AS STRING) AS description,
-        SAFE_CAST(priority AS STRING) AS priority,
-        SAFE_CAST(status AS STRING) AS status,
-        SAFE_CAST(channel AS STRING) AS channel,
-        SAFE_CAST(satisfaction_rating AS INT64) AS satisfaction_rating,
+        {{ dbt.safe_cast('ticket_id', dbt.type_string()) }} AS ticket_id,
+        {{ dbt.safe_cast('user_id', dbt.type_string()) }} AS user_id,
+        {{ dbt.safe_cast('rental_id', dbt.type_string()) }} AS rental_id,
+        {{ dbt.safe_cast('incident_id', dbt.type_string()) }} AS incident_id,
+        {{ dbt.safe_cast('vehicle_id', dbt.type_string()) }} AS vehicle_id,
+        {{ dbt.safe_cast('category', dbt.type_string()) }} AS category,
+        {{ dbt.safe_cast('subject', dbt.type_string()) }} AS subject,
+        {{ dbt.safe_cast('description', dbt.type_string()) }} AS description,
+        {{ dbt.safe_cast('priority', dbt.type_string()) }} AS priority,
+        {{ dbt.safe_cast('status', dbt.type_string()) }} AS status,
+        {{ dbt.safe_cast('channel', dbt.type_string()) }} AS channel,
+        {{ dbt.safe_cast('satisfaction_rating', dbt.type_bigint()) }} AS satisfaction_rating,
         {{ cast_iso_datetimes(['created_at', 'updated_at']) }},
         {{ cast_ingestion_timestamp('ingestion_timestamp') }} AS ingestion_timestamp
     FROM extraction

@@ -1,10 +1,13 @@
+{% set raw_source = source('drive_raw', 'drive_ticket_history_raw') %}
+
 WITH
 
 raw AS (
     SELECT
         timestamp,
         data
-    FROM {{ source('drive_raw', 'drive_ticket_history_raw') }}
+    FROM {{ raw_source }}
+    {{ limit_data_in_dev('timestamp', raw_source) }}
 ),
 
 extraction AS (
@@ -24,12 +27,12 @@ extraction AS (
 
 type_casting AS (
     SELECT
-        SAFE_CAST(history_id AS STRING) AS history_id,
-        SAFE_CAST(ticket_id AS STRING) AS ticket_id,
-        SAFE_CAST(changed_by AS STRING) AS changed_by,
-        SAFE_CAST(field_changed AS STRING) AS field_changed,
-        SAFE_CAST(old_value AS STRING) AS old_value,
-        SAFE_CAST(new_value AS STRING) AS new_value,
+        {{ dbt.safe_cast('history_id', dbt.type_string()) }} AS history_id,
+        {{ dbt.safe_cast('ticket_id', dbt.type_string()) }} AS ticket_id,
+        {{ dbt.safe_cast('changed_by', dbt.type_string()) }} AS changed_by,
+        {{ dbt.safe_cast('field_changed', dbt.type_string()) }} AS field_changed,
+        {{ dbt.safe_cast('old_value', dbt.type_string()) }} AS old_value,
+        {{ dbt.safe_cast('new_value', dbt.type_string()) }} AS new_value,
         {{ cast_iso_datetimes(['changed_at']) }},
         {{ cast_ingestion_timestamp('ingestion_timestamp') }} AS ingestion_timestamp
     FROM extraction

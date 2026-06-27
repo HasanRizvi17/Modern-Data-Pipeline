@@ -22,8 +22,8 @@ extraction AS (
 
 type_casting AS (
     SELECT
-        SAFE_CAST(package_id AS STRING) AS package_id,
-        SAFE_CAST(package_name AS STRING) AS package_name,
+        {{ dbt.safe_cast('package_id', dbt.type_string()) }} AS package_id,
+        {{ dbt.safe_cast('package_name', dbt.type_string()) }} AS package_name,
         {{ cast_iso_datetimes(['active_from', 'active_to', 'created_at']) }},
         {{ cast_ingestion_timestamp('ingestion_timestamp') }} AS ingestion_timestamp
     FROM extraction

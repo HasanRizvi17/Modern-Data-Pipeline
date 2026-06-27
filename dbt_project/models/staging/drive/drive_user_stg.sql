@@ -23,10 +23,10 @@ extraction AS (
 
 type_casting AS (
     SELECT
-        SAFE_CAST(user_id AS STRING) AS user_id,
-        SAFE_CAST(email AS STRING) AS email,
-        SAFE_CAST(status AS STRING) AS status,
-        SAFE_CAST(city_id AS STRING) AS city_id,
+        {{ dbt.safe_cast('user_id', dbt.type_string()) }} AS user_id,
+        {{ dbt.safe_cast('email', dbt.type_string()) }} AS email,
+        {{ dbt.safe_cast('status', dbt.type_string()) }} AS status,
+        {{ dbt.safe_cast('city_id', dbt.type_string()) }} AS city_id,
         {{ cast_iso_datetimes(['created_at', 'updated_at']) }},
         {{ cast_ingestion_timestamp('ingestion_timestamp') }} AS ingestion_timestamp
     FROM extraction

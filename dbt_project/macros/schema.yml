@@ -74,3 +74,46 @@ macros:
       - name: fields
         type: list
         description: List of field names to extract from the JSON column
+
+  - name: limit_data_in_dev
+    description: >
+      Adds a WHERE clause limiting rows to a recent lookback window when running against the dev target, to
+      reduce dev run time/cost on high-volume sources. The window is anchored to MAX(column_name) in the source
+      itself (not wall-clock CURRENT_TIMESTAMP), so it works correctly against frozen/historical seed data as well
+      as live-streaming sources. No-op (renders nothing) outside of dev. Only applied to fact-like/transactional
+      staging sources, not slowly-changing reference tables, so dev-side relationships tests against unfiltered
+      dimension parents keep passing.
+    arguments:
+      - name: column_name
+        type: string
+        description: The source timestamp column to filter on (the raw ingestion `timestamp` column)
+      - name: source_relation
+        type: relation
+        description: The same source() relation used in the model's FROM clause, used to compute MAX(column_name)
+      - name: dev_days_back
+        type: numeric
+        description: Number of days of data (relative to the source's own most recent row) to keep when running in dev (default = 3)
+
+  - name: drop_stale_nodes
+    description: >
+      Run-operation that finds tables/views sitting in our managed datasets which no longer correspond to a current
+      model, seed, or snapshot (e.g. left behind after a rename or deletion) and drops them. Only scans datasets
+      that appear among our own buildable nodes, so source/raw datasets are never touched. Defaults to a dry run
+      that just logs what would be dropped.
+    arguments:
+      - name: dryrun
+        type: boolean
+        description: When true (default), only logs orphaned relations found. When false, actually drops them.
+
+  - name: drop_unreferenced_nodes
+    description: >
+      Run-operation that finds staging/intermediate models with no downstream dependents -- i.e. no other model,
+      seed, or snapshot in the project currently has a ref() to them -- and drops their tables. Logs a per-layer
+      summary (total vs. unused count for staging, and the same for intermediate) before listing the unreferenced
+      models by name. Only looks at dependencies inside dbt (ref()/source()); a model queried directly by a BI tool
+      or notebook outside dbt would still be flagged, so review the dry-run output before dropping. Defaults to a
+      dry run that just logs what would be dropped.
+    arguments:
+      - name: dryrun
+        type: boolean
+        description: When true (default), only logs unreferenced models found. When false, actually drops them.

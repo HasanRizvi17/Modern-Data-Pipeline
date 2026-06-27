@@ -21,8 +21,8 @@ extraction AS (
 
 type_casting AS (
     SELECT
-        SAFE_CAST(market_id AS STRING) AS market_id,
-        SAFE_CAST(market_name AS STRING) AS market_name,
+        {{ dbt.safe_cast('market_id', dbt.type_string()) }} AS market_id,
+        {{ dbt.safe_cast('market_name', dbt.type_string()) }} AS market_name,
         {{ cast_iso_datetimes(['created_at', 'updated_at']) }},
         {{ cast_ingestion_timestamp('ingestion_timestamp') }} AS ingestion_timestamp
     FROM extraction

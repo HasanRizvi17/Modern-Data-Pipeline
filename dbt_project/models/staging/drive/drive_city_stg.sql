@@ -23,10 +23,10 @@ extraction AS (
 
 type_casting AS (
     SELECT
-        SAFE_CAST(city_id AS STRING) AS city_id,
-        SAFE_CAST(country_id AS STRING) AS country_id,
-        SAFE_CAST(city_name AS STRING) AS city_name,
-        SAFE_CAST(timezone AS STRING) AS timezone,
+        {{ dbt.safe_cast('city_id', dbt.type_string()) }} AS city_id,
+        {{ dbt.safe_cast('country_id', dbt.type_string()) }} AS country_id,
+        {{ dbt.safe_cast('city_name', dbt.type_string()) }} AS city_name,
+        {{ dbt.safe_cast('timezone', dbt.type_string()) }} AS timezone,
         {{ cast_iso_datetimes(['created_at', 'updated_at']) }},
         {{ cast_ingestion_timestamp('ingestion_timestamp') }} AS ingestion_timestamp
     FROM extraction
