@@ -12,7 +12,7 @@ dbt_project/dbt_packages
 dbt_project/.user.yml
 dbt_project/package-lock.yml
 dbt_project/dist
-dbt_project/coverage.json  # dbt-coverage report, regenerated on demand
+dbt_project/coverage.json
 
 # Airflow
 airflow_dags/__pycache__/  # Cached Python files in DAGs
