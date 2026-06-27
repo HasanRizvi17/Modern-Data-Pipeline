@@ -1,0 +1,28 @@
+version: 2
+
+models:
+  - name: ext_fx_rates_int
+    description: >
+      Intermediate model normalizing the staged weekly FX rates onto a EUR-denominated
+      basis (rate to convert each foreign currency into EUR) and forward-filling them
+      across a full calendar-date spine, so every date has a usable conversion rate
+      for downstream payment and revenue calculations.
+
+    columns:
+      - name: date
+        description: Calendar date for which the exchange rate applies, spanning the full date spine (forward-filled from the most recently known rate).
+        tests:
+          - not_null
+
+      - name: from_currency
+        description: The foreign currency code being converted from (USD, CAD, GBP).
+        tests:
+          - not_null
+
+      - name: to_currency
+        description: The target currency code, always EUR.
+        tests:
+          - not_null
+
+      - name: rate
+        description: Exchange rate to convert one unit of from_currency into EUR (inverse of the staged rate).

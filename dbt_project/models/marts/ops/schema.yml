@@ -37,6 +37,9 @@ models:
         tests:
           - not_null
 
+      - name: incident_status
+        description: "{{ doc('incident_status') }}"
+
       - name: rental_id
         description: Identifier of the rental associated with the incident, if any.
 

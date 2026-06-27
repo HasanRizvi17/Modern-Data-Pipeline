@@ -289,6 +289,9 @@ models:
         tests:
           - not_null
 
+      - name: city_name
+        description: Name of the city where the vehicle is located
+
       - name: vehicle_status
         description: "{{ doc('vehicle_status') }}"
         tests:
