@@ -671,6 +671,9 @@ models:
         tests:
           - not_null
 
+      - name: created_date
+        description: Date (day-level) on which the rental record was created, derived from created_at
+
       - name: updated_at
         description: Timestamp at which the rental was last updated
 
@@ -889,12 +892,30 @@ models:
           - accepted_values:
               values: ['minor','moderate','severe','critical']
 
+      - name: description
+        description: Free-text description of the incident.
+
+      - name: estimated_cost
+        description: Estimated financial cost associated with the incident.
+
       - name: status
         description: "{{ doc('incident_status') }}"
         tests:
           - not_null
           - accepted_values:
               values: ['reported','under_review','resolved','closed','insurance_claimed']
+
+      - name: police_report_filed
+        description: Indicates whether a police report was filed for the incident.
+
+      - name: reported_at
+        description: Timestamp when the incident was reported.
+
+      - name: incident_time
+        description: Timestamp when the incident actually occurred (may differ from reported_at, when it was reported).
+
+      - name: resolved_at
+        description: Timestamp when the incident was resolved.
 
       - name: created_at
         description: Timestamp at which the incident was created
@@ -961,6 +982,12 @@ models:
           - not_null
           - accepted_values:
               values: ['billing', 'vehicle_issue', 'account', 'booking', 'incident', 'app_bug', 'other']
+
+      - name: subject
+        description: Subject or issue type of the support ticket.
+
+      - name: description
+        description: Detailed description provided in the support ticket.
 
       - name: priority
         description: "{{ doc('support_ticket_priority') }}"

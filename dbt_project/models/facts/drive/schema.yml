@@ -143,6 +143,12 @@ models:
       - name: end_city
         description: Name of the city where the rental ended.
 
+      - name: start_country
+        description: Name of the country where the rental started.
+
+      - name: end_country
+        description: Name of the country where the rental ended.
+
       - name: vehicle_city
         description: Name of the city where the vehicle is assigned.
 

@@ -15,37 +15,235 @@ sources:
     tables:
       - name: drive_city_raw
         description: "Raw table containing JSON data for cities ingested from the DriveX database on MongoDB"
+        columns:
+          - name: document_id
+            description: "Unique identifier of the source MongoDB document this row was captured from (the Mongo _id), distinct from the business-level ID stored inside the data payload."
+          - name: operation
+            description: "Change-data-capture operation type that produced this row (e.g. insert, update, delete) from the source MongoDB collection."
+          - name: timestamp
+            description: "Timestamp at which this row was ingested into the raw layer."
+          - name: data
+            description: "Raw JSON payload containing the full city record as captured from MongoDB."
+          - name: date
+            description: "Ingestion/partition date for this row, used to partition the raw table in BigQuery."
       - name: drive_country_raw
         description: "Raw table containing JSON data for countries ingested from the DriveX database on MongoDB"
+        columns:
+          - name: document_id
+            description: "Unique identifier of the source MongoDB document this row was captured from (the Mongo _id), distinct from the business-level ID stored inside the data payload."
+          - name: operation
+            description: "Change-data-capture operation type that produced this row (e.g. insert, update, delete) from the source MongoDB collection."
+          - name: timestamp
+            description: "Timestamp at which this row was ingested into the raw layer."
+          - name: data
+            description: "Raw JSON payload containing the full country record as captured from MongoDB."
+          - name: date
+            description: "Ingestion/partition date for this row, used to partition the raw table in BigQuery."
       - name: drive_market_raw
         description: "Raw table containing JSON data for markets ingested from the DriveX database on MongoDB"
+        columns:
+          - name: document_id
+            description: "Unique identifier of the source MongoDB document this row was captured from (the Mongo _id), distinct from the business-level ID stored inside the data payload."
+          - name: operation
+            description: "Change-data-capture operation type that produced this row (e.g. insert, update, delete) from the source MongoDB collection."
+          - name: timestamp
+            description: "Timestamp at which this row was ingested into the raw layer."
+          - name: data
+            description: "Raw JSON payload containing the full market record as captured from MongoDB."
+          - name: date
+            description: "Ingestion/partition date for this row, used to partition the raw table in BigQuery."
       - name: drive_user_raw
         description: "Raw table containing JSON data for users ingested from the DriveX database on MongoDB"
+        columns:
+          - name: document_id
+            description: "Unique identifier of the source MongoDB document this row was captured from (the Mongo _id), distinct from the business-level ID stored inside the data payload."
+          - name: operation
+            description: "Change-data-capture operation type that produced this row (e.g. insert, update, delete) from the source MongoDB collection."
+          - name: timestamp
+            description: "Timestamp at which this row was ingested into the raw layer."
+          - name: data
+            description: "Raw JSON payload containing the full user record as captured from MongoDB."
+          - name: date
+            description: "Ingestion/partition date for this row, used to partition the raw table in BigQuery."
       - name: drive_vehicle_model_raw
         description: "Raw table containing JSON data for vehicle models ingested from the DriveX database on MongoDB"
+        columns:
+          - name: document_id
+            description: "Unique identifier of the source MongoDB document this row was captured from (the Mongo _id), distinct from the business-level ID stored inside the data payload."
+          - name: operation
+            description: "Change-data-capture operation type that produced this row (e.g. insert, update, delete) from the source MongoDB collection."
+          - name: timestamp
+            description: "Timestamp at which this row was ingested into the raw layer."
+          - name: data
+            description: "Raw JSON payload containing the full vehicle model record as captured from MongoDB."
+          - name: date
+            description: "Ingestion/partition date for this row, used to partition the raw table in BigQuery."
       - name: drive_vehicle_fleet_raw
         description: "Raw table containing JSON data for vehicle fleets ingested from the DriveX database on MongoDB"
+        columns:
+          - name: document_id
+            description: "Unique identifier of the source MongoDB document this row was captured from (the Mongo _id), distinct from the business-level ID stored inside the data payload."
+          - name: operation
+            description: "Change-data-capture operation type that produced this row (e.g. insert, update, delete) from the source MongoDB collection."
+          - name: timestamp
+            description: "Timestamp at which this row was ingested into the raw layer."
+          - name: data
+            description: "Raw JSON payload containing the full vehicle fleet record as captured from MongoDB."
+          - name: date
+            description: "Ingestion/partition date for this row, used to partition the raw table in BigQuery."
       - name: drive_vehicle_raw
         description: "Raw table containing JSON data for vehicles ingested from the DriveX database on MongoDB"
+        columns:
+          - name: document_id
+            description: "Unique identifier of the source MongoDB document this row was captured from (the Mongo _id), distinct from the business-level ID stored inside the data payload."
+          - name: operation
+            description: "Change-data-capture operation type that produced this row (e.g. insert, update, delete) from the source MongoDB collection."
+          - name: timestamp
+            description: "Timestamp at which this row was ingested into the raw layer."
+          - name: data
+            description: "Raw JSON payload containing the full vehicle record as captured from MongoDB."
+          - name: date
+            description: "Ingestion/partition date for this row, used to partition the raw table in BigQuery."
       - name: drive_trip_package_raw
         description: "Raw table containing JSON data for trip packages ingested from the DriveX database on MongoDB"
+        columns:
+          - name: document_id
+            description: "Unique identifier of the source MongoDB document this row was captured from (the Mongo _id), distinct from the business-level ID stored inside the data payload."
+          - name: operation
+            description: "Change-data-capture operation type that produced this row (e.g. insert, update, delete) from the source MongoDB collection."
+          - name: timestamp
+            description: "Timestamp at which this row was ingested into the raw layer."
+          - name: data
+            description: "Raw JSON payload containing the full trip package record as captured from MongoDB."
+          - name: date
+            description: "Ingestion/partition date for this row, used to partition the raw table in BigQuery."
       - name: drive_promotion_raw
         description: "Raw table containing JSON data for promotions ingested from the DriveX database on MongoDB"
+        columns:
+          - name: document_id
+            description: "Unique identifier of the source MongoDB document this row was captured from (the Mongo _id), distinct from the business-level ID stored inside the data payload."
+          - name: operation
+            description: "Change-data-capture operation type that produced this row (e.g. insert, update, delete) from the source MongoDB collection."
+          - name: timestamp
+            description: "Timestamp at which this row was ingested into the raw layer."
+          - name: data
+            description: "Raw JSON payload containing the full promotion record as captured from MongoDB."
+          - name: date
+            description: "Ingestion/partition date for this row, used to partition the raw table in BigQuery."
       - name: drive_user_promotion_raw
         description: "Raw table containing JSON data for user promotions ingested from the DriveX database on MongoDB"
+        columns:
+          - name: document_id
+            description: "Unique identifier of the source MongoDB document this row was captured from (the Mongo _id), distinct from the business-level ID stored inside the data payload."
+          - name: operation
+            description: "Change-data-capture operation type that produced this row (e.g. insert, update, delete) from the source MongoDB collection."
+          - name: timestamp
+            description: "Timestamp at which this row was ingested into the raw layer."
+          - name: data
+            description: "Raw JSON payload containing the full user promotion record as captured from MongoDB."
+          - name: date
+            description: "Ingestion/partition date for this row, used to partition the raw table in BigQuery."
       - name: drive_reservation_raw
         description: "Raw table containing JSON data for reservations ingested from the DriveX database on MongoDB"
+        columns:
+          - name: document_id
+            description: "Unique identifier of the source MongoDB document this row was captured from (the Mongo _id), distinct from the business-level ID stored inside the data payload."
+          - name: operation
+            description: "Change-data-capture operation type that produced this row (e.g. insert, update, delete) from the source MongoDB collection."
+          - name: timestamp
+            description: "Timestamp at which this row was ingested into the raw layer."
+          - name: data
+            description: "Raw JSON payload containing the full reservation record as captured from MongoDB."
+          - name: date
+            description: "Ingestion/partition date for this row, used to partition the raw table in BigQuery."
       - name: drive_rental_raw
         description: "Raw table containing JSON data for rentals ingested from the DriveX database on MongoDB"
+        columns:
+          - name: document_id
+            description: "Unique identifier of the source MongoDB document this row was captured from (the Mongo _id), distinct from the business-level ID stored inside the data payload."
+          - name: operation
+            description: "Change-data-capture operation type that produced this row (e.g. insert, update, delete) from the source MongoDB collection."
+          - name: timestamp
+            description: "Timestamp at which this row was ingested into the raw layer."
+          - name: data
+            description: "Raw JSON payload containing the full rental record as captured from MongoDB."
+          - name: date
+            description: "Ingestion/partition date for this row, used to partition the raw table in BigQuery."
       - name: drive_rental_rating_raw
         description: "Raw table containing JSON data for rental ratings ingested from the DriveX database on MongoDB"
+        columns:
+          - name: document_id
+            description: "Unique identifier of the source MongoDB document this row was captured from (the Mongo _id), distinct from the business-level ID stored inside the data payload."
+          - name: operation
+            description: "Change-data-capture operation type that produced this row (e.g. insert, update, delete) from the source MongoDB collection."
+          - name: timestamp
+            description: "Timestamp at which this row was ingested into the raw layer."
+          - name: data
+            description: "Raw JSON payload containing the full rental rating record as captured from MongoDB."
+          - name: date
+            description: "Ingestion/partition date for this row, used to partition the raw table in BigQuery."
       - name: drive_payment_raw
         description: "Raw table containing JSON data for payments ingested from the DriveX database on MongoDB"
+        columns:
+          - name: document_id
+            description: "Unique identifier of the source MongoDB document this row was captured from (the Mongo _id), distinct from the business-level ID stored inside the data payload."
+          - name: operation
+            description: "Change-data-capture operation type that produced this row (e.g. insert, update, delete) from the source MongoDB collection."
+          - name: timestamp
+            description: "Timestamp at which this row was ingested into the raw layer."
+          - name: data
+            description: "Raw JSON payload containing the full payment record as captured from MongoDB."
+          - name: date
+            description: "Ingestion/partition date for this row, used to partition the raw table in BigQuery."
       - name: drive_refund_raw
         description: "Raw table containing JSON data for refunds ingested from the DriveX database on MongoDB"
+        columns:
+          - name: document_id
+            description: "Unique identifier of the source MongoDB document this row was captured from (the Mongo _id), distinct from the business-level ID stored inside the data payload."
+          - name: operation
+            description: "Change-data-capture operation type that produced this row (e.g. insert, update, delete) from the source MongoDB collection."
+          - name: timestamp
+            description: "Timestamp at which this row was ingested into the raw layer."
+          - name: data
+            description: "Raw JSON payload containing the full refund record as captured from MongoDB."
+          - name: date
+            description: "Ingestion/partition date for this row, used to partition the raw table in BigQuery."
       - name: drive_incident_raw
         description: "Raw table containing JSON data for incidents ingested from the DriveX database on MongoDB"
+        columns:
+          - name: document_id
+            description: "Unique identifier of the source MongoDB document this row was captured from (the Mongo _id), distinct from the business-level ID stored inside the data payload."
+          - name: operation
+            description: "Change-data-capture operation type that produced this row (e.g. insert, update, delete) from the source MongoDB collection."
+          - name: timestamp
+            description: "Timestamp at which this row was ingested into the raw layer."
+          - name: data
+            description: "Raw JSON payload containing the full incident record as captured from MongoDB."
+          - name: date
+            description: "Ingestion/partition date for this row, used to partition the raw table in BigQuery."
       - name: drive_support_ticket_raw
         description: "Raw table containing JSON data for support tickets ingested from the DriveX database on MongoDB"
+        columns:
+          - name: document_id
+            description: "Unique identifier of the source MongoDB document this row was captured from (the Mongo _id), distinct from the business-level ID stored inside the data payload."
+          - name: operation
+            description: "Change-data-capture operation type that produced this row (e.g. insert, update, delete) from the source MongoDB collection."
+          - name: timestamp
+            description: "Timestamp at which this row was ingested into the raw layer."
+          - name: data
+            description: "Raw JSON payload containing the full support ticket record as captured from MongoDB."
+          - name: date
+            description: "Ingestion/partition date for this row, used to partition the raw table in BigQuery."
       - name: drive_ticket_history_raw
         description: "Raw table containing JSON data for ticket histories ingested from the DriveX database on MongoDB"
+        columns:
+          - name: document_id
+            description: "Unique identifier of the source MongoDB document this row was captured from (the Mongo _id), distinct from the business-level ID stored inside the data payload."
+          - name: operation
+            description: "Change-data-capture operation type that produced this row (e.g. insert, update, delete) from the source MongoDB collection."
+          - name: timestamp
+            description: "Timestamp at which this row was ingested into the raw layer."
+          - name: data
+            description: "Raw JSON payload containing the full ticket history record as captured from MongoDB."
+          - name: date
+            description: "Ingestion/partition date for this row, used to partition the raw table in BigQuery."
